@@ -1,0 +1,10 @@
+{
+  "name": "jna-crm-enterprise",
+  "version": "1.0.0",
+  "description": "Jehovah Nissi Design Build Pvt. Ltd. Enterprise CRM",
+  "private": true,
+  "scripts": {
+    "build": "echo 'Static application deployment - no build step required'",
+    "start": "echo 'Static application - ready'"
+  }
+}
