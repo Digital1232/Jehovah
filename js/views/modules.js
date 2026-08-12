@@ -1128,7 +1128,7 @@ function reportsView() {
             <!-- ADDITIONAL KPIS STRIP -->
             <section class="card p-4 mb-6 bg-gradient-to-r from-blue-50 via-slate-50 to-indigo-50 text-slate-900 shadow-sm border border-blue-200">
                 <span class="tag bg-blue-100 text-blue-900 border border-blue-300 text-[10px] uppercase font-bold tracking-widest mb-3 inline-block">EXECUTIVE PERFORMANCE KPIS</span>
-                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 text-center">
+                <div class="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-7 gap-2.5 text-center">
                     <div class="p-2.5 rounded-xl bg-white border border-blue-200/80 shadow-sm">
                         <span class="text-[10px] text-slate-600 font-extrabold block uppercase">Lead Response Time</span>
                         <strong class="text-base text-emerald-700 font-extrabold mt-0.5 block">8.4 Mins</strong>
