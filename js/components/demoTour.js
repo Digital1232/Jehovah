@@ -133,12 +133,12 @@ function updateCountdownUI() {
     if (badge) {
         if (autoPlayEnabled && !demoPaused) {
             badge.textContent = `Auto-Next in ${currentCountdown}s`;
-            badge.classList.remove("hidden");
+            badge.className = "tag bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold";
         } else if (demoPaused) {
             badge.textContent = "Paused ⏸";
-            badge.classList.remove("hidden");
+            badge.className = "tag bg-slate-700 text-slate-300 border border-slate-600 text-[10px] font-bold";
         } else {
-            badge.classList.add("hidden");
+            badge.className = "hidden";
         }
     }
     if (bar) {
@@ -158,8 +158,8 @@ function refreshControlUI() {
     }
     if (autoPlayBtn) {
         autoPlayBtn.className = autoPlayEnabled 
-            ? "btn py-1 px-2 text-[11px] bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold" 
-            : "btn py-1 px-2 text-[11px] bg-slate-100 text-slate-700 border border-slate-300 font-medium";
+            ? "px-2.5 py-1 rounded-lg text-[11px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold" 
+            : "px-2.5 py-1 rounded-lg text-[11px] bg-white/10 text-slate-300 border border-white/15 font-medium";
         autoPlayBtn.textContent = autoPlayEnabled ? "Auto Play: ON (1 min)" : "Auto Play: OFF";
     }
     updateCountdownUI();
@@ -174,52 +174,32 @@ function spotlight(s) {
     $("#overlayRoot").innerHTML = `
         <div class="demo-dim"></div>
         <div id="demoRing" class="demo-ring"></div>
-        <aside id="demoTooltip" class="demo-tooltip shadow-2xl border border-slate-200">
-            <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-                <span class="text-[10px] font-bold tracking-widest text-blue-600 uppercase">Step ${demoIndex + 1} of ${demoSteps.length}</span>
-                <span id="demoTimerBadge" class="tag bg-amber-100 text-amber-900 text-[10px] font-bold"></span>
-            </div>
-            
-            <div class="mt-2">
-                <span class="tag bg-blue-100 text-blue-800 text-[10px] font-bold uppercase">${ROLE_CONFIG[s[0]].label}</span>
-                <h3 class="font-bold text-slate-900 text-base mt-1">Menu ${s[5]} of ${s[6]}: ${s[4]}</h3>
-                <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">${s[3]}</p>
-            </div>
-            
-            <!-- STEP NAVIGATION CONTROLS -->
-            <div class="mt-4 pt-3 border-t flex items-center justify-between gap-1.5">
-                <button class="btn btn-outline text-xs py-1.5 px-2.5" onclick="prevDemoStep()" ${isFirstStep ? "disabled" : ""}>
-                    <i data-lucide="chevron-left" class="w-4 h-4"></i> Prev
-                </button>
-                
-                <button id="demoPauseBtn" class="btn btn-secondary text-xs py-1.5 px-3" onclick="toggleDemoPause()">
-                    <i data-lucide="${demoPaused ? "play" : "pause"}" class="w-3.5 h-3.5"></i> ${demoPaused ? "Resume ▶" : "Pause ⏸"}
-                </button>
-                
-                <button class="btn btn-primary text-xs py-1.5 px-3" onclick="nextDemoStep()">
-                    ${isLastStep ? "Finish ✓" : "Next ▶"}
-                </button>
-            </div>
-        </aside>
 
-        <!-- BOTTOM CONTROL & PROGRESS BAR -->
-        <section class="demo-bar flex flex-col gap-2 bg-white text-slate-900 border border-slate-200 shadow-2xl">
-            <div class="flex justify-between items-center text-xs">
-                <div class="flex items-center gap-3">
-                    <span class="text-slate-900 font-semibold"><b>DEMO TOUR:</b> ${ROLE_CONFIG[s[0]].label} → ${s[4]} Menu (${s[5]}/${s[6]})</span>
-                    <button id="demoAutoPlayBtn" onclick="toggleAutoPlay()" class="btn py-1 px-2 text-[11px] ${autoPlayEnabled ? "bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold" : "bg-slate-100 text-slate-700 border border-slate-300 font-medium"}">
+        <!-- FLOATING DARK GLASSMORPHISM CONTROL BAR & PROGRESS BAR -->
+        <section class="demo-bar flex flex-col gap-2.5">
+            <div class="flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="tag bg-blue-500/25 text-blue-300 border border-blue-400/30 text-[10px] uppercase font-bold tracking-widest">${ROLE_CONFIG[s[0]].label}</span>
+                    <span class="text-white font-bold">Menu ${s[5]} of ${s[6]}: <span class="text-blue-300 font-extrabold">${s[4]}</span></span>
+                    <span id="demoTimerBadge" class="tag bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold"></span>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <button id="demoPauseBtn" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white border border-white/20 text-[11px] font-semibold flex items-center gap-1.5 transition-all" onclick="toggleDemoPause()">
+                        <i data-lucide="${demoPaused ? "play" : "pause"}" class="w-3.5 h-3.5"></i> ${demoPaused ? "Resume ▶" : "Pause ⏸"}
+                    </button>
+                    <button id="demoAutoPlayBtn" onclick="toggleAutoPlay()" class="px-2.5 py-1 rounded-lg text-[11px] transition-all">
                         ${autoPlayEnabled ? "Auto Play: ON (1 min)" : "Auto Play: OFF"}
                     </button>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button class="text-slate-700 hover:text-slate-900 px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[11px] font-semibold" onclick="prevDemoStep()" ${isFirstStep ? "disabled" : ""}>◄ Prev</button>
-                    <button class="text-slate-700 hover:text-slate-900 px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[11px] font-semibold" onclick="nextDemoStep()">Next ►</button>
-                    <button class="text-red-600 hover:text-red-800 font-bold ml-2 text-xs" onclick="exitDemo()">Exit Tour</button>
+                    <button class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 border border-white/20 text-[11px] font-semibold" onclick="prevDemoStep()" ${isFirstStep ? "disabled" : ""}>◄ Prev</button>
+                    <button class="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold shadow-sm" onclick="nextDemoStep()">${isLastStep ? "Finish ✓" : "Next ►"}</button>
+                    <button class="text-red-400 hover:text-red-300 font-bold ml-2 text-xs" onclick="exitDemo()">Exit Tour</button>
                 </div>
             </div>
+
             <!-- ANIMATED COUNTDOWN PROGRESS BAR -->
-            <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden flex">
-                <div id="demoCountdownBar" class="bg-blue-600 h-full transition-all duration-1000 ease-linear" style="width:100%"></div>
+            <div class="w-full bg-slate-800/80 h-2 rounded-full overflow-hidden flex border border-slate-700/50">
+                <div id="demoCountdownBar" class="bg-gradient-to-r from-blue-500 to-indigo-400 h-full transition-all duration-1000 ease-linear shadow-sm" style="width:100%"></div>
             </div>
         </section>
     `;
@@ -229,18 +209,12 @@ function spotlight(s) {
     refreshControlUI();
 
     const ring = $("#demoRing");
-    const tip = $("#demoTooltip");
     const r = target.getBoundingClientRect();
 
     ring.style.left = Math.max(6, r.left - 6) + "px";
     ring.style.top = Math.max(6, r.top - 6) + "px";
     ring.style.width = Math.min(innerWidth - 12, r.width + 12) + "px";
     ring.style.height = Math.min(innerHeight - 12, r.height + 12) + "px";
-
-    if (innerWidth > 900) {
-        tip.style.left = Math.min(innerWidth - 400, Math.max(16, r.right + 20)) + "px";
-        tip.style.top = Math.max(20, Math.min(innerHeight - 260, r.top)) + "px";
-    }
 }
 
 function prevDemoStep() {

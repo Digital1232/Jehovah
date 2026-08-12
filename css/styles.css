@@ -456,28 +456,25 @@ button {
 }
 
 .demo-tooltip {
-    position: fixed;
-    z-index: 93;
-    width: min(380px, calc(100% - 32px));
-    background: #fff;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
-    border: 1px solid #e2e8f0;
+    display: none !important;
 }
 
 .demo-bar {
     position: fixed;
     z-index: 94;
-    bottom: 20px;
+    bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
-    width: min(850px, calc(100% - 32px));
-    background: #ffffff;
-    color: #0f172a;
-    border: 1px solid #cbd5e1;
-    border-radius: 14px;
-    padding: 14px 20px;
+    width: min(920px, calc(100% - 32px));
+    background: rgba(15, 23, 42, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 18px;
+    padding: 16px 22px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+}
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
 }
 
