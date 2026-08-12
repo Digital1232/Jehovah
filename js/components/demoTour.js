@@ -310,15 +310,17 @@ function nextDemoStep() {
     if (demoIndex >= demoSteps.length - 1) {
         demoActive = false;
         openModal(`
-            <div class="text-center p-4">
-                <div class="w-14 h-14 rounded-2xl mx-auto bg-emerald-50 text-emerald-600 grid place-items-center mb-3">
-                    <i data-lucide="check-circle-2" class="w-8 h-8"></i>
+            <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 p-6 border-b border-emerald-100 text-center relative">
+                <div class="w-14 h-14 rounded-2xl mx-auto bg-emerald-600 text-white grid place-items-center mb-3 shadow-lg shadow-emerald-600/25">
+                    <i data-lucide="trophy" class="w-8 h-8"></i>
                 </div>
-                <h3 class="text-xl font-bold text-slate-900">Guided Demo Tour Completed!</h3>
-                <p class="text-xs text-slate-500 mt-1">Successfully demonstrated all user roles and their complete navigation menu workflows!</p>
-                <button class="btn btn-primary w-full mt-6" onclick="closeOverlay();switchRole('MAIN_ADMIN')">Return to Main Admin</button>
+                <h3 class="text-xl font-extrabold text-slate-900">Guided Demo Tour Completed!</h3>
+                <p class="text-xs text-slate-600 mt-1 font-medium">Successfully demonstrated all user roles and their complete navigation menu workflows.</p>
             </div>
-        `);
+            <div class="p-6 text-center">
+                <button class="btn btn-primary w-full py-2.5 text-xs font-bold shadow-md" onclick="closeOverlay();switchRole('MAIN_ADMIN')">Return to Main Admin Workspace</button>
+            </div>
+        `, "max-w-md p-0 overflow-hidden");
         return;
     }
     demoIndex++;

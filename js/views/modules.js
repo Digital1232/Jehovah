@@ -72,32 +72,29 @@ function openWhatsAppSimulator(clientName = "John Mathews", phone = "+91 98401 1
     }
 
     openModal(`
-        <div class="modal max-w-md p-0 bg-transparent shadow-none border-0 flex justify-center">
-            <div class="wa-phone">
-                <div class="wa-header">
-                    <div class="flex items-center gap-2.5">
-                        <button onclick="closeOverlay()" class="text-white p-1 hover:bg-white/10 rounded"><i data-lucide="arrow-left" class="w-4 h-4"></i></button>
-                        <div class="w-8 h-8 rounded-full bg-emerald-700 text-white font-bold grid place-items-center text-xs">JNDB</div>
-                        <div>
-                            <strong class="text-xs text-white block font-semibold leading-tight">Jehovah Nissi Design Build</strong>
-                            <span class="text-[10px] text-emerald-200 block">Verified Business Account ✓</span>
-                        </div>
+        <div class="wa-phone mx-auto">
+            <div class="wa-header flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <button onclick="closeOverlay()" class="text-white p-1 hover:bg-white/10 rounded"><i data-lucide="arrow-left" class="w-4 h-4"></i></button>
+                    <div class="w-8 h-8 rounded-full bg-emerald-700 text-white font-bold grid place-items-center text-xs">JNDB</div>
+                    <div>
+                        <strong class="text-xs text-white block font-semibold leading-tight">Jehovah Nissi Design Build</strong>
+                        <span class="text-[10px] text-emerald-200 block">Verified Business Account ✓</span>
                     </div>
-                    <button onclick="closeOverlay()" class="text-white text-xs"><i data-lucide="x" class="w-4 h-4"></i></button>
-                </div>
-                
-                <div class="wa-chat-body">
-                    <div class="text-center my-1"><span class="bg-amber-100 text-amber-900 text-[10px] px-2 py-0.5 rounded-full font-medium">TODAY · WHATSAPP BUSINESS DEMO</span></div>
-                    ${bodyContent}
-                </div>
-
-                <div class="wa-footer">
-                    <input class="input py-1.5 px-3 text-xs bg-white rounded-full border-0 focus:ring-0" placeholder="Type simulated reply..." />
-                    <button class="btn btn-whatsapp p-2 rounded-full" onclick="toast('WhatsApp Demo Reply Sent!', 'send');closeOverlay();"><i data-lucide="send" class="w-4 h-4"></i></button>
                 </div>
             </div>
+            
+            <div class="wa-chat-body">
+                <div class="text-center my-1"><span class="bg-amber-100 text-amber-900 text-[10px] px-2 py-0.5 rounded-full font-medium">TODAY · WHATSAPP BUSINESS DEMO</span></div>
+                ${bodyContent}
+            </div>
+
+            <div class="wa-footer">
+                <input class="input py-1.5 px-3 text-xs bg-white rounded-full border-0 focus:ring-0" placeholder="Type simulated reply..." />
+                <button class="btn btn-whatsapp p-2 rounded-full" onclick="toast('WhatsApp Demo Reply Sent!', 'send');closeOverlay();"><i data-lucide="send" class="w-4 h-4"></i></button>
+            </div>
         </div>
-    `);
+    `, "max-w-md p-0 border-0 bg-transparent shadow-none");
 }
 
 // WHATSAPP HUB VIEW (PRESERVED FOR FUTURE USE)
@@ -307,22 +304,41 @@ function enquiryFormView() {
         };
         state.enquiries.unshift(newObj);
         openModal(`
-            <div class="text-center p-4">
-                <div class="w-14 h-14 rounded-2xl mx-auto bg-emerald-50 text-emerald-600 grid place-items-center mb-3">
+            <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 p-6 border-b border-emerald-100 text-center relative">
+                <div class="w-14 h-14 rounded-2xl mx-auto bg-emerald-600 text-white grid place-items-center mb-3 shadow-lg shadow-emerald-600/25">
                     <i data-lucide="check-circle-2" class="w-8 h-8"></i>
                 </div>
                 <h3 class="text-xl font-bold text-slate-900">Enquiry Created & Auto-Assigned!</h3>
-                <p class="text-xs text-slate-500 mt-1">The CRM auto-assignment engine has processed this record.</p>
-                <div class="mt-5 text-left text-xs bg-slate-50 p-4 rounded-xl space-y-2 border">
-                    <div class="flex justify-between"><span>Enquiry ID:</span><b class="text-blue-600 font-mono">${newId}</b></div>
-                    <div class="flex justify-between"><span>Assigned Branch:</span><b>${newObj.branch}</b></div>
-                    <div class="flex justify-between"><span>Assigned Design TL:</span><b>${newObj.tl}</b></div>
-                    <div class="flex justify-between"><span>Assigned ASM:</span><b>${newObj.asm}</b></div>
-                    <div class="flex justify-between text-emerald-700 font-bold"><span>10-Min SLA Timer:</span><span>ACTIVE (Green)</span></div>
-                </div>
-                <button class="btn btn-primary w-full mt-6" onclick="closeOverlay();show('enquiries')">Return to Enquiries Table</button>
+                <p class="text-xs text-slate-600 mt-1 font-medium">The CRM auto-assignment engine has processed this record.</p>
             </div>
-        `);
+
+            <div class="p-6 space-y-3.5 text-xs">
+                <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                    <span class="text-slate-500 font-semibold">Enquiry ID</span>
+                    <span class="tag bg-blue-50 text-blue-700 border border-blue-200 font-mono font-bold text-xs">${newId}</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                    <span class="text-slate-500 font-semibold">Assigned Branch</span>
+                    <span class="font-bold text-slate-900">${newObj.branch}</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                    <span class="text-slate-500 font-semibold">Assigned Design TL</span>
+                    <span class="font-bold text-slate-900">${newObj.tl}</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                    <span class="text-slate-500 font-semibold">Assigned ASM</span>
+                    <span class="font-bold text-slate-900">${newObj.asm}</span>
+                </div>
+                <div class="flex justify-between items-center py-2">
+                    <span class="text-slate-500 font-semibold">10-Min SLA Timer</span>
+                    <span class="tag bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold uppercase">ACTIVE (Green)</span>
+                </div>
+
+                <div class="pt-3">
+                    <button class="btn btn-primary w-full py-2.5 text-xs font-bold shadow-sm" onclick="closeOverlay();show('enquiries')">Return to Enquiries Table</button>
+                </div>
+            </div>
+        `, "max-w-md p-0 overflow-hidden");
     };
 }
 
@@ -416,14 +432,13 @@ function openLeadDetailModal(enqId) {
     const timeline = lead.timeline || [];
 
     openModal(`
-        <div class="modal max-w-4xl p-6 space-y-6">
-            <div class="flex justify-between items-start pb-4 border-b">
+        <div class="p-6 space-y-6">
+            <div class="flex justify-between items-start pb-4 border-b border-slate-200 pr-8">
                 <div>
-                    <span class="tag bg-blue-100 text-blue-800 text-xs font-semibold">${lead.service} · ${lead.branch}</span>
-                    <h2 class="text-2xl font-bold text-slate-900 mt-1">${lead.client} — ${lead.project}</h2>
-                    <p class="text-xs text-slate-500 mt-0.5">Enquiry ID: <span class="font-mono text-blue-600 font-bold">${lead.id}</span> · Phone: <b>${lead.phone}</b></p>
+                    <span class="tag bg-blue-100 text-blue-800 text-xs font-bold">${lead.service} · ${lead.branch}</span>
+                    <h2 class="text-2xl font-extrabold text-slate-900 mt-1">${lead.client} — ${lead.project}</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Enquiry ID: <span class="font-mono text-blue-600 font-bold">${lead.id}</span> · Phone: <b class="text-slate-800">${lead.phone}</b></p>
                 </div>
-                <button onclick="closeOverlay()" class="btn btn-outline p-1.5"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
 
             <!-- KEY CLIENT SPECS -->
@@ -517,9 +532,8 @@ function openLeadDetailModal(enqId) {
                 ${lead.status !== "Converted" ? `
                     <button class="btn btn-primary text-xs py-2 px-4" onclick="closeOverlay();convertAction('${lead.id}')">Convert to Job Card (JC Number Generator)</button>
                 ` : `<span class="tag bg-emerald-100 text-emerald-800 font-bold">Converted to Job Card ✓</span>`}
-            </div>
         </div>
-    `);
+    `, "max-w-4xl");
 
     $("#discussionLogForm").onsubmit = e => {
         e.preventDefault();
@@ -651,10 +665,13 @@ function followupsView() {
 function openASMUpdateModal(enqId) {
     const enq = state.enquiries.find(x => x.id === enqId) || state.enquiries[0];
     openModal(`
-        <form id="asmUpdateForm" class="p-2 space-y-4 text-xs">
-            <h3 class="text-lg font-bold text-slate-900">Module 4 — ASM Follow-up Update</h3>
-            <p class="text-slate-500">Updating record for <b>${enq.client} (${enq.id})</b>. No re-entry required.</p>
-            
+        <div class="bg-gradient-to-r from-blue-50 via-slate-50 to-indigo-50 p-6 border-b border-blue-100 pr-12">
+            <span class="tag bg-blue-100 text-blue-800 text-[10px] font-bold uppercase tracking-widest">MODULE 4 — ASM FOLLOW-UP CONTROL</span>
+            <h3 class="text-xl font-bold text-slate-900 mt-1">ASM Follow-up Status Update</h3>
+            <p class="text-xs text-slate-600 mt-1">Updating client record for <b class="text-slate-900">${enq.client} (${enq.id})</b>. Replaces Excel completely.</p>
+        </div>
+
+        <form id="asmUpdateForm" class="p-6 space-y-4 text-xs">
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="label block mb-1">Last Follow-up Date *</label>
@@ -693,15 +710,15 @@ function openASMUpdateModal(enqId) {
 
             <div>
                 <label class="label block mb-1">Discussion Notes *</label>
-                <textarea id="fNotes" class="textarea h-20" required>Followed up with client. Confirmed budget approval meeting scheduled for tomorrow.</textarea>
+                <textarea id="fNotes" class="textarea h-20" required placeholder="Log client discussion feedback...">Followed up with client. Confirmed budget approval meeting scheduled for tomorrow.</textarea>
             </div>
 
-            <div class="pt-3 border-t flex justify-end gap-2">
-                <button type="button" class="btn btn-outline text-xs" onclick="closeOverlay()">Cancel</button>
-                <button type="submit" class="btn btn-primary text-xs">Save Follow-up Record</button>
+            <div class="pt-3 border-t flex justify-end gap-2 border-slate-100">
+                <button type="button" class="btn btn-outline text-xs px-4" onclick="closeOverlay()">Cancel</button>
+                <button type="submit" class="btn btn-primary text-xs px-5 font-bold shadow-md">Save Follow-up Record</button>
             </div>
         </form>
-    `);
+    `, "max-w-xl p-0 overflow-hidden");
 
     $("#asmUpdateForm").onsubmit = e => {
         e.preventDefault();
@@ -893,41 +910,39 @@ function jobcardsView() {
 function openJobCardPaymentModal(jcId) {
     const jc = state.jobCards.find(x => x.id === jcId) || state.jobCards[0];
     openModal(`
-        <div class="p-4 space-y-4 text-xs">
-            <div class="flex justify-between items-start pb-3 border-b">
-                <div>
-                    <span class="tag bg-blue-100 text-blue-800 text-xs font-semibold">${jc.id} · ${jc.branch}</span>
-                    <h3 class="text-xl font-bold text-slate-900 mt-1">${jc.client} — ${jc.project}</h3>
-                </div>
-                <button onclick="closeOverlay()" class="btn btn-outline p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
-            </div>
+        <div class="bg-gradient-to-r from-blue-50 via-slate-50 to-indigo-50 p-6 border-b border-blue-100 pr-12">
+            <span class="tag bg-blue-100 text-blue-800 text-[10px] font-bold uppercase tracking-widest">${jc.id} · ${jc.branch}</span>
+            <h3 class="text-xl font-bold text-slate-900 mt-1">${jc.client} — ${jc.project}</h3>
+            <p class="text-xs text-slate-600 mt-1">Payment Stage & Collection Milestone Control</p>
+        </div>
 
+        <div class="p-6 space-y-5 text-xs">
             <!-- PAYMENT MILESTONE TRACKING -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div class="p-3 rounded-xl bg-slate-50 border">
-                    <span class="label">Total Cost:</span>
-                    <b class="block text-slate-900 text-base mt-1">${money(jc.totalCost || jc.value)}</b>
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 shadow-sm">
+                    <span class="label block uppercase text-[10px]">Total Cost:</span>
+                    <b class="block text-slate-900 text-base font-extrabold mt-1">${money(jc.totalCost || jc.value)}</b>
                 </div>
-                <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200">
-                    <span class="label text-emerald-800">Advance Paid (25%):</span>
-                    <b class="block text-emerald-800 text-base mt-1">${money(jc.advancePaid || (jc.value * 0.25))}</b>
+                <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 shadow-sm">
+                    <span class="label text-emerald-800 block uppercase text-[10px]">Advance Paid (25%):</span>
+                    <b class="block text-emerald-800 text-base font-extrabold mt-1">${money(jc.advancePaid || (jc.value * 0.25))}</b>
                 </div>
-                <div class="p-3 rounded-xl bg-blue-50 border border-blue-200">
-                    <span class="label text-blue-800">2nd Payment (25%):</span>
-                    <b class="block text-blue-800 text-base mt-1">${money(jc.secondPayment || (jc.value * 0.25))}</b>
+                <div class="p-3.5 rounded-xl bg-blue-50 border border-blue-200 shadow-sm">
+                    <span class="label text-blue-800 block uppercase text-[10px]">2nd Payment (25%):</span>
+                    <b class="block text-blue-800 text-base font-extrabold mt-1">${money(jc.secondPayment || (jc.value * 0.25))}</b>
                 </div>
-                <div class="p-3 rounded-xl bg-amber-50 border border-amber-200">
-                    <span class="label text-amber-800">Pending Amount:</span>
-                    <b class="block text-amber-900 text-base mt-1">${money(jc.balance || (jc.value * 0.5))}</b>
+                <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 shadow-sm">
+                    <span class="label text-amber-800 block uppercase text-[10px]">Pending Amount:</span>
+                    <b class="block text-amber-900 text-base font-extrabold mt-1">${money(jc.balance || (jc.value * 0.5))}</b>
                 </div>
             </div>
 
-            <div class="pt-3 flex justify-between items-center border-t">
-                <span class="text-slate-500 font-medium">Promised Delivery Date: <b>${jc.deliveryDate || jc.promisedDate}</b></span>
-                <button class="btn btn-primary text-xs" onclick="closeOverlay();recordPaymentAction();">Record Stage Payment</button>
+            <div class="pt-4 flex flex-wrap justify-between items-center border-t border-slate-100 gap-3">
+                <span class="text-slate-600 font-semibold">Promised Delivery Date: <b class="text-slate-900">${jc.deliveryDate || jc.promisedDate}</b></span>
+                <button class="btn btn-primary text-xs py-2 px-4 font-bold shadow-md" onclick="closeOverlay();recordPaymentAction();">Record Stage Payment</button>
             </div>
         </div>
-    `);
+    `, "max-w-2xl p-0 overflow-hidden");
 }
 
 // PAYMENTS VIEW
