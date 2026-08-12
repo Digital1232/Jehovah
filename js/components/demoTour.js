@@ -203,7 +203,6 @@ function spotlight(s) {
     const isLastStep = demoIndex === demoSteps.length - 1;
 
     $("#overlayRoot").innerHTML = `
-        <div class="demo-dim"></div>
         <div id="demoRing" class="demo-ring"></div>
 
         <!-- FLOATING DARK GLASSMORPHISM CONTROL BAR & PROGRESS BAR -->
