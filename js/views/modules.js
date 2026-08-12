@@ -1,8 +1,8 @@
 // ==========================================
-// MODULE VIEW RENDERERS & WHATSAPP DEMO SIMULATOR
+// MODULE VIEW RENDERERS & WHATSAPP DEMO SIMULATOR (HIDDEN IN UI FOR NOW)
 // ==========================================
 
-// INTERACTIVE WHATSAPP SIMULATOR MODAL
+// INTERACTIVE WHATSAPP SIMULATOR MODAL (PRESERVED FOR FUTURE USE)
 function openWhatsAppSimulator(clientName = "John Mathews", phone = "+91 98401 12345", messageType = "quotation", payload = {}) {
     let bodyContent = "";
     
@@ -100,7 +100,7 @@ function openWhatsAppSimulator(clientName = "John Mathews", phone = "+91 98401 1
     `);
 }
 
-// WHATSAPP HUB VIEW
+// WHATSAPP HUB VIEW (PRESERVED FOR FUTURE USE)
 function whatsappHubView() {
     content.innerHTML = `
         <div class="page">
@@ -209,10 +209,7 @@ function enquiriesView() {
                                     </td>
                                     <td><span class="tag bg-blue-50 text-blue-700 font-semibold">${x.status}</span></td>
                                     <td>
-                                        <div class="flex items-center gap-1.5">
-                                            <button class="btn btn-outline py-1 px-2 text-xs" onclick="show('leads')">Detail</button>
-                                            <button class="btn btn-whatsapp py-1 px-2 text-xs" onclick="openWhatsAppSimulator('${x.client}', '${x.phone}', 'quotation', {amount: money(x.value)})" title="WhatsApp Client">💬</button>
-                                        </div>
+                                        <button class="btn btn-outline py-1 px-2.5 text-xs" onclick="show('leads')">View Detail</button>
                                     </td>
                                 </tr>
                             `).join("")}
@@ -323,10 +320,7 @@ function enquiryFormView() {
                     <div class="flex justify-between"><span>Assigned ASM:</span><b>${newObj.asm}</b></div>
                     <div class="flex justify-between text-emerald-700 font-bold"><span>10-Min SLA Timer:</span><span>ACTIVE (Green)</span></div>
                 </div>
-                <div class="mt-5 flex gap-2">
-                    <button class="btn btn-whatsapp text-xs w-full py-2" onclick="closeOverlay();openWhatsAppSimulator('${newObj.client}', '${newObj.phone}', 'quotation', {amount: money(newObj.value)})">💬 Send Welcome on WhatsApp</button>
-                    <button class="btn btn-primary text-xs w-full py-2" onclick="closeOverlay();show('enquiries')">Return to Enquiries</button>
-                </div>
+                <button class="btn btn-primary w-full mt-6" onclick="closeOverlay();show('enquiries')">Return to Enquiries Table</button>
             </div>
         `);
     };
@@ -340,9 +334,6 @@ function leadsView() {
     content.innerHTML = `
         <div class="page">
             ${head("CLIENT TIMELINE & LEADS", lead.client, `
-                <button class="btn btn-whatsapp text-xs" onclick="openWhatsAppSimulator('${lead.client}', '${lead.phone}', 'quotation', {amount: money(lead.value)})">
-                    <i data-lucide="message-square" class="w-4 h-4"></i> WhatsApp Client
-                </button>
                 <button class="btn btn-outline text-xs" onclick="show('followups')"><i data-lucide="history" class="w-4 h-4"></i>Follow-up History</button>
                 ${canCreate("meetings") ? `<button class="btn btn-primary text-xs" onclick="show('meetings')">Schedule Meeting</button>` : ""}
             `)}
@@ -387,17 +378,12 @@ function leadsView() {
                     </div>
                 </section>
 
-                <aside class="card p-6 flex flex-col justify-between">
-                    <div>
-                        <h3 class="font-bold text-slate-900 text-sm">Access Scope Info</h3>
-                        <div class="mt-4 p-4 rounded-xl bg-slate-50 border text-xs space-y-2">
-                            <div class="flex justify-between"><span class="text-slate-500">Current Role:</span><b>${ROLE_CONFIG[role].shortLabel}</b></div>
-                            <div class="flex justify-between"><span class="text-slate-500">Scoped Enquiries:</span><b class="text-blue-600">${rows.length} visible</b></div>
-                        </div>
+                <aside class="card p-6">
+                    <h3 class="font-bold text-slate-900 text-sm">Access Scope Info</h3>
+                    <div class="mt-4 p-4 rounded-xl bg-slate-50 border text-xs space-y-2">
+                        <div class="flex justify-between"><span class="text-slate-500">Current Role:</span><b>${ROLE_CONFIG[role].shortLabel}</b></div>
+                        <div class="flex justify-between"><span class="text-slate-500">Scoped Enquiries:</span><b class="text-blue-600">${rows.length} visible</b></div>
                     </div>
-                    <button class="btn btn-whatsapp w-full text-xs py-2 mt-6" onclick="openWhatsAppSimulator('${lead.client}', '${lead.phone}', 'quotation', {amount: money(lead.value)})">
-                        💬 Open WhatsApp Chat Simulator
-                    </button>
                 </aside>
             </div>
         </div>
@@ -409,7 +395,6 @@ function meetingsView() {
     content.innerHTML = `
         <div class="page">
             ${head("COMMERCIAL MEETINGS", "Scheduled Meetings", `
-                <button class="btn btn-whatsapp text-xs" onclick="openWhatsAppSimulator('John Mathews', '+91 98401 12345', 'construction', {})">💬 Send WhatsApp Reminder</button>
                 <button class="btn btn-primary text-xs" onclick="toast('Meeting outcome logged in timeline.')">Save Meeting Notes</button>
             `)}
             <section class="card p-6 max-w-4xl">
@@ -437,7 +422,6 @@ function followupsView() {
     content.innerHTML = `
         <div class="page">
             ${head("SALES FOLLOW-UPS", "Follow-up Management", `
-                <button class="btn btn-whatsapp text-xs" onclick="openWhatsAppSimulator('Senthil Nathan (ASM)', '+91 98400 11223', 'sla', {})">💬 WhatsApp SLA Alert</button>
                 <button class="btn btn-primary text-xs" onclick="addFollowupModal()"><i data-lucide="plus" class="w-4 h-4"></i>Add New Follow-up</button>
             `)}
             <div class="grid lg:grid-cols-3 gap-5">
@@ -545,9 +529,6 @@ function quotationsView() {
     content.innerHTML = `
         <div class="page">
             ${head("COMMERCIAL WORKFLOW", "Quotation Builder & Approval", `
-                <button class="btn btn-whatsapp text-xs" onclick="openWhatsAppSimulator('John Mathews', '+91 98401 12345', 'quotation', {amount: '${amountVal}'})">
-                    💬 Send Quote on WhatsApp
-                </button>
                 <button class="btn btn-outline text-xs" onclick="show('packages')"><i data-lucide="box" class="w-4 h-4"></i>Package Rules</button>
             `)}
             <div class="grid lg:grid-cols-5 gap-6">
@@ -582,16 +563,13 @@ function quotationsView() {
                             </div>
                         </div>
                     </div>
-                    <div class="mt-6 space-y-2">
-                        <button class="btn btn-whatsapp w-full py-2 text-xs" onclick="openWhatsAppSimulator('John Mathews', '+91 98401 12345', 'quotation', {amount: '${amountVal}'})">
-                            💬 Send Quotation on WhatsApp
-                        </button>
+                    <div class="mt-6">
                         ${isBM ? `
-                            <button class="btn btn-primary w-full py-2 text-xs" onclick="requestQuotationRevision()">
+                            <button class="btn btn-primary w-full py-2.5 text-xs" onclick="requestQuotationRevision()">
                                 ${state.revisionApproved ? "Revision Approved ✓" : "Submit Revision Request (BM → Admin)"}
                             </button>
                         ` : `
-                            <button class="btn btn-primary w-full py-2 text-xs" onclick="show('jobcards')">Convert to Job Card</button>
+                            <button class="btn btn-primary w-full py-2.5 text-xs" onclick="show('jobcards')">Convert to Job Card</button>
                         `}
                     </div>
                 </aside>
@@ -693,9 +671,6 @@ function paymentsView() {
     content.innerHTML = `
         <div class="page">
             ${head("FINANCE WORKFLOW", "Payments & Collections", `
-                <button class="btn btn-whatsapp text-xs" onclick="openWhatsAppSimulator('John Mathews', '+91 98401 12345', 'payment', {amount: '₹21,25,000', project: 'Luxury Villa Design'})">
-                    💬 Send WhatsApp Payment Link
-                </button>
                 ${isAccounts ? `<button class="btn btn-primary text-xs" onclick="recordPaymentAction()"><i data-lucide="plus" class="w-4 h-4"></i>Record 2nd Milestone Payment</button>` : ""}
             `)}
             <section class="card p-6 max-w-4xl">
@@ -753,7 +728,6 @@ function projectsView() {
     content.innerHTML = `
         <div class="page">
             ${head("PROJECT EXECUTION", "Active Projects Dashboard", `
-                <button class="btn btn-whatsapp text-xs" onclick="openWhatsAppSimulator('Greenfield Infra', '+91 94433 22110', 'construction', {})">💬 Send WhatsApp Update</button>
                 <button class="btn btn-primary text-xs" onclick="show('construction')">View Construction Stages</button>
             `)}
             <section class="card p-6">
@@ -776,7 +750,6 @@ function constructionView() {
     content.innerHTML = `
         <div class="page">
             ${head("11-STAGE CONSTRUCTION TRACKER", "Construction Stages", `
-                <button class="btn btn-whatsapp text-xs" onclick="openWhatsAppSimulator('Greenfield Infra', '+91 94433 22110', 'construction', {})">💬 Send WhatsApp Stage Ping</button>
                 <button class="btn btn-primary text-xs" onclick="toast('Stage completion updated.')">Save Stage Progress</button>
             `)}
             <section class="card p-6">
