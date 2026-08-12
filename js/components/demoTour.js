@@ -196,6 +196,59 @@ function refreshControlUI() {
     icons();
 }
 
+function makeDemoBarDraggable() {
+    const bar = document.querySelector(".demo-bar");
+    if (!bar) return;
+
+    let isDragging = false;
+    let startX, startY, initialLeft, initialTop;
+
+    bar.addEventListener("mousedown", (e) => {
+        if (e.target.closest("button") || e.target.closest("a") || e.target.closest("input")) return;
+
+        isDragging = true;
+        bar.classList.add("is-dragging");
+        startX = e.clientX;
+        startY = e.clientY;
+
+        const rect = bar.getBoundingClientRect();
+        initialLeft = rect.left;
+        initialTop = rect.top;
+
+        bar.style.transform = "none";
+        bar.style.bottom = "auto";
+        bar.style.left = initialLeft + "px";
+        bar.style.top = initialTop + "px";
+
+        e.preventDefault();
+    });
+
+    const onMouseMove = (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+
+        let newLeft = initialLeft + dx;
+        let newTop = initialTop + dy;
+
+        newLeft = Math.max(10, Math.min(window.innerWidth - bar.offsetWidth - 10, newLeft));
+        newTop = Math.max(10, Math.min(window.innerHeight - bar.offsetHeight - 10, newTop));
+
+        bar.style.left = newLeft + "px";
+        bar.style.top = newTop + "px";
+    };
+
+    const onMouseUp = () => {
+        if (isDragging) {
+            isDragging = false;
+            bar.classList.remove("is-dragging");
+        }
+    };
+
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+}
+
 function spotlight(s) {
     const target = document.querySelector(".page") || document.querySelector(s[2]) || content;
     activeTargetEl = target;
@@ -209,6 +262,7 @@ function spotlight(s) {
         <section class="demo-bar flex flex-col gap-2.5">
             <div class="flex flex-wrap items-center justify-between gap-3 text-xs">
                 <div class="flex flex-wrap items-center gap-2">
+                    <i data-lucide="grip-vertical" class="w-4 h-4 text-slate-400 cursor-grab flex-shrink-0 mr-0.5" title="Drag to move control bar"></i>
                     <span class="tag bg-blue-500/25 text-blue-300 border border-blue-400/30 text-[10px] uppercase font-bold tracking-widest">${ROLE_CONFIG[s[0]].label}</span>
                     <span class="text-white font-bold">Menu ${s[5]} of ${s[6]}: <span class="text-blue-300 font-extrabold">${s[4]}</span></span>
                     <span id="demoTimerBadge" class="tag bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold"></span>
@@ -238,6 +292,7 @@ function spotlight(s) {
     target.classList.add("demo-focus");
     refreshControlUI();
     updateRingPosition();
+    makeDemoBarDraggable();
 }
 
 function prevDemoStep() {
