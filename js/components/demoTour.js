@@ -1,63 +1,43 @@
 // ==========================================
-// GUIDED DEMO TOUR SYSTEM (WITH NEXT, PREVIOUS, PAUSE/RESUME & AUTO PLAY)
+// GUIDED DEMO TOUR SYSTEM (ROLE BY ROLE & MENU BY MENU)
 // ==========================================
-const demoSteps = [
-    // USER 1: MANAGING DIRECTOR (MD)
-    ["MD", "dashboard", ".content", "Managing Director (MD): Full access to all branches, reports, and system settings across the enterprise."],
-    ["MD", "reports", ".content", "Managing Director (MD): Complete executive reports suite (Revenue, P&L, SLA, Branch Comparison)."],
-    ["MD", "settings", ".content", "Managing Director (MD): Full administrative control over global system settings."],
 
-    // USER 2: HEAD OFFICE ADMIN
-    ["HEAD_OFFICE_ADMIN", "dashboard", ".content", "Head Office Admin: Full operational control across all branches."],
-    ["HEAD_OFFICE_ADMIN", "enquiries", ".content", "Head Office Admin: Cross-branch operational management of enquiries, leads, and approvals."],
+function buildDemoStepsForRoles() {
+    const steps = [];
+    const roleKeys = Object.keys(ROLE_CONFIG);
 
-    // USER 3: ENQUIRY OFFICER
-    ["ENQUIRY", "dashboard", ".content", "Enquiry Officer: Intake workspace for logging incoming client requests."],
-    ["ENQUIRY", "new-enquiry", "#enquiryIntakeForm", "Enquiry Officer: Creates new enquiries; system auto-assigns branch/TL/ASM."],
+    roleKeys.forEach(rKey => {
+        const cfg = ROLE_CONFIG[rKey];
+        const tempRole = role;
+        role = rKey;
 
-    // USER 4: DESIGN TEAM LEADER (TL)
-    ["TL", "dashboard", ".content", "Design Team Leader (TL): Views and manages assigned leads for their own branch only."],
-    ["TL", "leads", ".content", "Design Team Leader (TL): Own-branch lead pipeline, design requirements, and consultation schedule."],
+        // Filter allowed navigation items for this role
+        const allowedNavs = NAVIGATION.filter(nav => {
+            if (nav.id === "demo-center") return false;
+            if (!nav.roles) return true;
+            return nav.roles.includes(rKey) && canView(nav.id);
+        });
 
-    // USER 5: ASSISTANT BRANCH MANAGER (ASM)
-    ["ASM", "dashboard", ".content", "Assistant Branch Manager (ASM): Manages follow-ups, meetings, and lead status for their own branch."],
-    ["ASM", "followups", ".content", "Assistant Branch Manager (ASM): Branch follow-up compliance, meeting logs, and lead status updates."],
+        allowedNavs.forEach((nav, idx) => {
+            const desc = `${cfg.label} [${cfg.department}]: Exploring '${nav.label}' Menu (${idx + 1}/${allowedNavs.length}). ${cfg.description}.`;
+            steps.push([
+                rKey,
+                nav.id,
+                ".content",
+                desc,
+                nav.label,
+                idx + 1,
+                allowedNavs.length
+            ]);
+        });
 
-    // USER 6: BRANCH MANAGER (BM)
-    ["BM", "dashboard", ".content", "Branch Manager: Full visibility of their own branch's performance."],
-    ["BM", "quotations", ".content", "Branch Manager: Own-branch sales conversion, team metrics, and quotation oversight."],
+        role = tempRole;
+    });
 
-    // USER 7: ACCOUNTS TEAM
-    ["ACCOUNTS", "dashboard", ".content", "Accounts Team: Access to job cards, payments, invoices, and balances (cross-branch)."],
-    ["ACCOUNTS", "payments", ".content", "Accounts Team: Cross-branch payment collection, milestone schedule, invoices, and receivables aging."],
+    return steps;
+}
 
-    // USER 8: PROJECT TEAM
-    ["PROJECT", "dashboard", ".content", "Project Team (future phase): Access granted only after project/job card confirmation."],
-    ["PROJECT", "construction", ".content", "Project Team: Unlocked strictly for confirmed job cards & projects (11-stage construction progress)."],
-
-    // USER 9: MAIN ADMIN
-    ["MAIN_ADMIN", "dashboard", ".content", "Main Admin: Master System Administration, user controls, and security logs."],
-    ["MAIN_ADMIN", "roles", ".content", "Main Admin: Dynamic Role Access Level & Permissions Matrix."],
-
-    // USER 10: SECOND ADMIN
-    ["SECOND_ADMIN", "dashboard", ".content", "Second Admin: Delegated operational control and quotation approval queue."],
-
-    // USER 11: MARKETING OFFICER (MO)
-    ["MO", "dashboard", ".content", "Marketing Officer: Lead source campaign metrics and conversion analytics."],
-
-    // USER 12: REAL ESTATE OFFICER
-    ["REAL_ESTATE", "dashboard", ".content", "Real Estate Officer: Service-scoped real estate properties and land deals."],
-
-    // USER 13: INTERIOR OFFICER
-    ["INTERIOR", "dashboard", ".content", "Interior Officer: Service-scoped interior fitout and design consultations."],
-
-    // USER 14: A-GRADE MO
-    ["A_GRADE_MO", "packages", ".content", "A-Grade MO: Package configuration engine with full editing privileges."],
-
-    // USER 15: D-GRADE MO
-    ["D_GRADE_MO", "packages", ".content", "D-Grade MO: Restricted package viewer with locked section controls."]
-];
-
+let demoSteps = [];
 let demoIndex = 0;
 let demoActive = false;
 let demoPaused = false;
@@ -67,6 +47,7 @@ let countdownTimer = null;
 let currentCountdown = stepDuration;
 
 function startRoleDemo() {
+    demoSteps = buildDemoStepsForRoles();
     demoActive = true;
     demoIndex = 0;
     demoPaused = false;
@@ -75,13 +56,20 @@ function startRoleDemo() {
 
 function runDemoStep() {
     clearAutoPlayTimer();
+    if (!demoSteps || !demoSteps.length) {
+        demoSteps = buildDemoStepsForRoles();
+    }
     const s = demoSteps[demoIndex];
+    if (!s) return;
+
+    // Switch Role and Navigate to Menu
     switchRole(s[0]);
     show(s[1]);
+
     setTimeout(() => {
         spotlight(s);
         startAutoPlayTimer();
-    }, 300);
+    }, 350);
 }
 
 function startAutoPlayTimer() {
@@ -192,8 +180,11 @@ function spotlight(s) {
                 <span id="demoTimerBadge" class="tag bg-amber-100 text-amber-900 text-[10px] font-bold"></span>
             </div>
             
-            <h3 class="font-bold text-slate-900 text-base mt-2">${ROLE_CONFIG[s[0]].label}</h3>
-            <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">${s[3]}</p>
+            <div class="mt-2">
+                <span class="tag bg-blue-100 text-blue-800 text-[10px] font-bold uppercase">${ROLE_CONFIG[s[0]].label}</span>
+                <h3 class="font-bold text-slate-900 text-base mt-1">Menu ${s[5]} of ${s[6]}: ${s[4]}</h3>
+                <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">${s[3]}</p>
+            </div>
             
             <!-- STEP NAVIGATION CONTROLS -->
             <div class="mt-4 pt-3 border-t flex items-center justify-between gap-1.5">
@@ -215,7 +206,7 @@ function spotlight(s) {
         <section class="demo-bar flex flex-col gap-2 bg-white text-slate-900 border border-slate-200 shadow-2xl">
             <div class="flex justify-between items-center text-xs">
                 <div class="flex items-center gap-3">
-                    <span class="text-slate-900 font-semibold"><b>USER DEMO TOUR:</b> ${ROLE_CONFIG[s[0]].label} (${demoIndex + 1}/${demoSteps.length})</span>
+                    <span class="text-slate-900 font-semibold"><b>DEMO TOUR:</b> ${ROLE_CONFIG[s[0]].label} → ${s[4]} Menu (${s[5]}/${s[6]})</span>
                     <button id="demoAutoPlayBtn" onclick="toggleAutoPlay()" class="btn py-1 px-2 text-[11px] ${autoPlayEnabled ? "bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold" : "bg-slate-100 text-slate-700 border border-slate-300 font-medium"}">
                         ${autoPlayEnabled ? "Auto Play: ON (1 min)" : "Auto Play: OFF"}
                     </button>
@@ -232,7 +223,7 @@ function spotlight(s) {
             </div>
         </section>
     `;
-    
+
     icons();
     target.classList.add("demo-focus");
     refreshControlUI();
@@ -272,7 +263,7 @@ function nextDemoStep() {
                     <i data-lucide="check-circle-2" class="w-8 h-8"></i>
                 </div>
                 <h3 class="text-xl font-bold text-slate-900">Guided Demo Tour Completed!</h3>
-                <p class="text-xs text-slate-500 mt-1">All 15 role views were demonstrated user-by-user.</p>
+                <p class="text-xs text-slate-500 mt-1">Successfully demonstrated all user roles and their complete navigation menu workflows!</p>
                 <button class="btn btn-primary w-full mt-6" onclick="closeOverlay();switchRole('MAIN_ADMIN')">Return to Main Admin</button>
             </div>
         `);
