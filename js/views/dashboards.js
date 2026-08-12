@@ -97,13 +97,38 @@ function accessDenied(requiredPermission = "Administrative Control") {
     `;
 }
 
+function roleHeaderBanner(cfg) {
+    if (!cfg) return "";
+    return `
+        <div class="mb-6 rounded-2xl bg-gradient-to-r from-blue-50 via-indigo-50 to-slate-50 p-5 text-slate-900 shadow-sm border border-blue-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="tag bg-blue-100 text-blue-900 border border-blue-300 text-[10px] uppercase font-bold tracking-widest">${cfg.branchScope} SCOPE</span>
+                    <span class="tag bg-white text-slate-700 border border-slate-200 text-[10px] font-semibold">${cfg.department}</span>
+                </div>
+                <h2 class="text-xl font-extrabold tracking-tight mt-1.5 text-slate-900">${cfg.label} Dashboard</h2>
+                <p class="text-xs text-slate-700 mt-1 font-medium max-w-2xl leading-relaxed">
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5 inline text-emerald-600 mr-1"></i>
+                    <b class="text-slate-900">Role Access Level:</b> ${cfg.description}
+                </p>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <button class="btn btn-outline border-blue-300 bg-white text-blue-900 hover:bg-blue-50 text-xs py-2 px-3 shadow-sm" onclick="show('roles')">
+                    <i data-lucide="shield" class="w-3.5 h-3.5 text-blue-600"></i> Roles Matrix
+                </button>
+            </div>
+        </div>
+    `;
+}
+
 // 1. MD DASHBOARD
 function dashboardMD() {
     content.innerHTML = `
         <div class="page">
+            ${roleHeaderBanner(ROLE_CONFIG[role])}
             ${head("EXECUTIVE BOARD OVERVIEW", "Managing Director Dashboard", `
                 <button class="btn btn-outline text-xs" onclick="show('reports')"><i data-lucide="file-bar-chart" class="w-4 h-4"></i>Executive Reports</button>
-                <button class="btn btn-primary text-xs" onclick="show('audit')"><i data-lucide="history" class="w-4 h-4"></i>System Audit</button>
+                <button class="btn btn-primary text-xs" onclick="show('settings')"><i data-lucide="settings" class="w-4 h-4"></i>System Settings</button>
             `)}
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 ${card("Total Enquiries", "128", "inbox", "#eff6ff", "#2563eb", "+12.4% vs last month")}
@@ -159,6 +184,7 @@ function dashboardMD() {
 function dashboardHOAdmin() {
     content.innerHTML = `
         <div class="page">
+            ${roleHeaderBanner(ROLE_CONFIG[role])}
             ${head("HEAD OFFICE OPERATIONAL CONTROL", "Head Office Admin Dashboard", `
                 <button class="btn btn-secondary text-xs" onclick="show('approvals')"><i data-lucide="badge-check" class="w-4 h-4"></i>Approvals Queue</button>
                 <button class="btn btn-primary text-xs" onclick="show('users')"><i data-lucide="users" class="w-4 h-4"></i>Manage Users</button>
@@ -199,9 +225,10 @@ function dashboardHOAdmin() {
 function dashboardMainAdmin() {
     content.innerHTML = `
         <div class="page">
+            ${roleHeaderBanner(ROLE_CONFIG[role])}
             ${head("PRIMARY OPERATIONAL CONTROL CENTER", "Main Admin Dashboard", `
                 <button class="btn btn-secondary text-xs" onclick="show('approvals')"><i data-lucide="badge-check" class="w-4 h-4"></i>Approval Center</button>
-                <button class="btn btn-primary text-xs" onclick="show('users')"><i data-lucide="shield-check" class="w-4 h-4"></i>Roles & Permissions</button>
+                <button class="btn btn-primary text-xs" onclick="show('roles')"><i data-lucide="shield-check" class="w-4 h-4"></i>Roles & Permissions</button>
             `)}
             <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
                 ${card("Total Enquiries", "128", "inbox")}
@@ -255,6 +282,7 @@ function dashboardMainAdmin() {
 function dashboardSecondAdmin() {
     content.innerHTML = `
         <div class="page">
+            ${roleHeaderBanner(ROLE_CONFIG[role])}
             ${head("DELEGATED OPERATIONAL CONTROL", "Second Admin Dashboard", `
                 <button class="btn btn-primary text-xs" onclick="show('approvals')">Review Approvals</button>
             `)}
@@ -279,6 +307,7 @@ function dashboardSecondAdmin() {
 function dashboardEnquiry() {
     content.innerHTML = `
         <div class="page">
+            ${roleHeaderBanner(ROLE_CONFIG[role])}
             ${head("ENQUIRY INTAKE & AUTO-ASSIGNMENT", "Enquiry Officer Dashboard", `
                 <button class="btn btn-primary text-xs" onclick="show('new-enquiry')"><i data-lucide="plus-circle" class="w-4 h-4"></i>Create New Enquiry</button>
             `)}
@@ -304,6 +333,7 @@ function dashboardEnquiry() {
 function dashboardTL() {
     content.innerHTML = `
         <div class="page">
+            ${roleHeaderBanner(ROLE_CONFIG[role])}
             ${head("CHENNAI BRANCH · DESIGN LEADERSHIP", "Design Team Leader Dashboard", `
                 <button class="btn btn-primary text-xs" onclick="show('meetings')"><i data-lucide="calendar-plus" class="w-4 h-4"></i>Schedule Meeting</button>
             `)}
@@ -326,32 +356,33 @@ function dashboardTL() {
 function dashboardASM() {
     content.innerHTML = `
         <div class="page">
+            ${roleHeaderBanner(ROLE_CONFIG[role])}
             ${head("CHENNAI BRANCH · SLA RESPONSE CONTROL", "Assistant Branch Manager (ASM) Dashboard", `
                 <button class="btn btn-primary text-xs" onclick="show('followups')"><i data-lucide="plus" class="w-4 h-4"></i>Add Follow-up</button>
             `)}
             
             <!-- 10-MINUTE SLA WIDGET -->
-            <section class="card p-6 border-blue-200 bg-gradient-to-r from-slate-900 via-blue-950 to-blue-900 text-white shadow-xl">
+            <section class="card p-6 border-blue-200 bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-100 text-slate-900 shadow-sm">
                 <div class="flex flex-wrap justify-between items-center gap-4">
                     <div>
-                        <span class="tag bg-blue-500/30 text-blue-200 border border-blue-400/40 text-[10px] uppercase font-bold tracking-widest">10-MINUTE SLA MONITOR</span>
-                        <h3 class="text-3xl font-bold mt-2">SLA Compliance: 94%</h3>
-                        <p class="text-xs text-blue-200 mt-1 max-w-lg leading-relaxed">
+                        <span class="tag bg-blue-100 text-blue-900 border border-blue-300 text-[10px] uppercase font-bold tracking-widest">10-MINUTE SLA MONITOR</span>
+                        <h3 class="text-3xl font-bold text-slate-900 mt-2">SLA Compliance: 94%</h3>
+                        <p class="text-xs text-slate-700 mt-1 max-w-lg leading-relaxed">
                             Every new enquiry requires initial client response and CRM activity logging within 10 minutes.
                         </p>
                     </div>
                     <div class="grid grid-cols-3 gap-3 text-center">
-                        <div class="rounded-xl bg-white/10 p-3 backdrop-blur-sm">
-                            <strong class="block text-xl text-emerald-400 font-bold">47</strong>
-                            <span class="text-[10px] text-blue-100 uppercase">Within SLA</span>
+                        <div class="rounded-xl bg-white p-3 border border-blue-200 shadow-sm">
+                            <strong class="block text-xl text-emerald-600 font-bold">47</strong>
+                            <span class="text-[10px] text-slate-600 font-bold uppercase">Within SLA</span>
                         </div>
-                        <div class="rounded-xl bg-white/10 p-3 backdrop-blur-sm">
-                            <strong class="block text-xl text-amber-400 font-bold">2</strong>
-                            <span class="text-[10px] text-blue-100 uppercase">Approaching</span>
+                        <div class="rounded-xl bg-white p-3 border border-blue-200 shadow-sm">
+                            <strong class="block text-xl text-amber-600 font-bold">2</strong>
+                            <span class="text-[10px] text-slate-600 font-bold uppercase">Approaching</span>
                         </div>
-                        <div class="rounded-xl bg-white/10 p-3 backdrop-blur-sm">
-                            <strong class="block text-xl text-red-400 font-bold">1</strong>
-                            <span class="text-[10px] text-blue-100 uppercase">Breached</span>
+                        <div class="rounded-xl bg-white p-3 border border-blue-200 shadow-sm">
+                            <strong class="block text-xl text-red-600 font-bold">1</strong>
+                            <span class="text-[10px] text-slate-600 font-bold uppercase">Breached</span>
                         </div>
                     </div>
                 </div>
@@ -367,23 +398,41 @@ function dashboardASM() {
     `;
 }
 
-// 8. BRANCH MANAGER DASHBOARD
+// 8. BRANCH MANAGER DASHBOARD (MODULE 2 — BRANCH DASHBOARD)
 function dashboardBM() {
+    const enqs = getScopedEnquiries();
+    const todaysCount = enqs.filter(x => x.created.includes("min") || x.created.includes("hr") || x.created.includes("Just now")).length;
+    const newLeads = enqs.filter(x => x.status === "New").length;
+    const pendingFollowups = enqs.filter(x => x.status === "Follow-up" || x.status === "Contacted").length;
+    const convertedProjects = enqs.filter(x => x.status === "Converted").length;
+    const cancelledCount = enqs.filter(x => x.status === "Cancelled").length;
+    const holdCount = enqs.filter(x => x.status === "Hold").length;
+    const upcomingMeetings = enqs.filter(x => x.status === "Meeting Scheduled" || x.status === "Meeting").length;
+
     content.innerHTML = `
         <div class="page">
-            ${head("CHENNAI BRANCH · PERFORMANCE", "Branch Manager Dashboard", `
-                <button class="btn btn-secondary text-xs" onclick="show('quotations')"><i data-lucide="file-text" class="w-4 h-4"></i>Quotation Workflow</button>
+            ${roleHeaderBanner(ROLE_CONFIG[role])}
+            ${head(`${branch.toUpperCase()} · PERFORMANCE`, `${branch} Dashboard`, `
+                <button class="btn btn-secondary text-xs" onclick="show('leads')"><i data-lucide="contact-round" class="w-4 h-4"></i>Branch Leads</button>
+                <button class="btn btn-primary text-xs" onclick="show('quotations')"><i data-lucide="file-text" class="w-4 h-4"></i>Quotation Workflow</button>
             `)}
             <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 font-semibold mb-6 flex items-center gap-2">
                 <i data-lucide="lock" class="w-4 h-4 text-amber-700 flex-shrink-0"></i>
-                <span>PERMANENT SCOPE LOCK: This view is strictly restricted to Chennai Branch data. Cross-branch options disabled.</span>
+                <span>BRANCH SCOPE ENFORCED: Viewing strictly ${branch} data. Head Office can switch across all branches.</span>
             </div>
+
+            <!-- MODULE 2 KPI GRID -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                ${card("Branch Enquiries", "24", "inbox")}
-                ${card("Branch Conversion", "26%", "target", "#f0fdf4", "#16a34a")}
-                ${card("Branch Revenue", "₹1.82 Cr", "indian-rupee")}
-                ${card("ASM SLA Rate", "94%", "timer", "#f0fdf4", "#16a34a")}
+                ${card("Today's Enquiries", todaysCount.toString(), "inbox", "#eff6ff", "#2563eb", "Branch Intake")}
+                ${card("New Leads", newLeads.toString(), "sparkles", "#f0fdf4", "#16a34a", "Fresh Assignments")}
+                ${card("Pending Follow-ups", pendingFollowups.toString(), "calendar-clock", "#fffbeb", "#d97706", "Active Pipeline")}
+                ${card("Converted Projects", convertedProjects.toString(), "check-circle-2", "#f0fdf4", "#16a34a", "Job Cards Active")}
+                ${card("Cancelled Leads", cancelledCount.toString(), "x-circle", "#fef2f2", "#b91c1c", "Lost Deals")}
+                ${card("On Hold", holdCount.toString(), "pause-circle", "#eff6ff", "#3b82f6", "Paused Leads")}
+                ${card("Upcoming Meetings", upcomingMeetings.toString(), "users-round", "#f5f3ff", "#7c3aed", "Scheduled Sessions")}
+                ${card("Branch Revenue", "₹1.82 Cr", "indian-rupee", "#f0fdf4", "#16a34a", "YTD Collected")}
             </div>
+
             <section class="card p-6 mt-6">
                 <h3 class="font-bold text-slate-900">Branch Quotation Revision Controls</h3>
                 <p class="text-xs text-slate-600 mt-1">
@@ -399,6 +448,7 @@ function dashboardBM() {
 function dashboardMO() {
     content.innerHTML = `
         <div class="page">
+            ${roleHeaderBanner(ROLE_CONFIG[role])}
             ${head("MARKETING CAMPAIGNS & INTAKE", "Marketing Officer Dashboard", "")}
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 ${card("Active Campaigns", "4", "megaphone")}
@@ -414,6 +464,7 @@ function dashboardMO() {
 function dashboardAccounts() {
     content.innerHTML = `
         <div class="page">
+            ${roleHeaderBanner(ROLE_CONFIG[role])}
             ${head("CROSS-BRANCH FINANCIAL CONTROL", "Accounts Dashboard", `
                 <button class="btn btn-primary text-xs" onclick="show('payments')"><i data-lucide="credit-card" class="w-4 h-4"></i>Record Payment</button>
             `)}
@@ -453,6 +504,7 @@ function dashboardAccounts() {
 function dashboardProject() {
     content.innerHTML = `
         <div class="page">
+            ${roleHeaderBanner(ROLE_CONFIG[role])}
             ${head("PROJECT EXECUTION WORKSPACE", "Project Team Dashboard", `
                 <button class="btn btn-primary text-xs" onclick="show('construction')"><i data-lucide="hammer" class="w-4 h-4"></i>Update Stages</button>
             `)}
@@ -488,6 +540,7 @@ function dashboardService() {
 
     content.innerHTML = `
         <div class="page">
+            ${roleHeaderBanner(ROLE_CONFIG[role])}
             ${head(`${serviceName.toUpperCase()} · SERVICE WORKSPACE`, `${serviceName} Officer Dashboard`, `
                 <button class="btn btn-primary text-xs" onclick="show('leads')">Open ${serviceName} Leads</button>
             `)}
@@ -510,6 +563,7 @@ function dashboardPackageMO() {
     const isAGrade = role === "A_GRADE_MO";
     content.innerHTML = `
         <div class="page">
+            ${roleHeaderBanner(ROLE_CONFIG[role])}
             ${head("COMMERCIAL PACKAGE MANAGEMENT", `${isAGrade ? "A-Grade MO" : "D-Grade MO"} Dashboard`, `
                 <button class="btn btn-primary text-xs" onclick="show('packages')">Open Package Config</button>
             `)}

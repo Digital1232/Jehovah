@@ -3,67 +3,59 @@
 // ==========================================
 const demoSteps = [
     // USER 1: MANAGING DIRECTOR (MD)
-    ["MD", "dashboard", ".content", "User 1/15 (Managing Director): Executive Dashboard with cross-branch KPIs, revenue trends, conversion funnel, and SLA compliance."],
-    ["MD", "reports", ".content", "User 1/15 (Managing Director): Executive Reports Engine for cross-branch strategic & financial analysis."],
-    ["MD", "audit", ".content", "User 1/15 (Managing Director): Master System Audit Trail for executive oversight."],
+    ["MD", "dashboard", ".content", "Managing Director (MD): Full access to all branches, reports, and system settings across the enterprise."],
+    ["MD", "reports", ".content", "Managing Director (MD): Complete executive reports suite (Revenue, P&L, SLA, Branch Comparison)."],
+    ["MD", "settings", ".content", "Managing Director (MD): Full administrative control over global system settings."],
 
     // USER 2: HEAD OFFICE ADMIN
-    ["HEAD_OFFICE_ADMIN", "dashboard", ".content", "User 2/15 (Head Office Admin): High-level Operational Control Center across all branches."],
-    ["HEAD_OFFICE_ADMIN", "enquiries", ".content", "User 2/15 (Head Office Admin): Master Enquiries Table with global branch search and filtering."],
+    ["HEAD_OFFICE_ADMIN", "dashboard", ".content", "Head Office Admin: Full operational control across all branches."],
+    ["HEAD_OFFICE_ADMIN", "enquiries", ".content", "Head Office Admin: Cross-branch operational management of enquiries, leads, and approvals."],
 
-    // USER 3: MAIN ADMIN
-    ["MAIN_ADMIN", "dashboard", ".content", "User 3/15 (Main Admin): Primary Operational Dashboard with SLA breaches, pending approvals, and security alerts."],
-    ["MAIN_ADMIN", "approvals", ".content", "User 3/15 (Main Admin): Approval Queue for quotation revisions and payment exception requests."],
-    ["MAIN_ADMIN", "users", ".content", "User 3/15 (Main Admin): User Management for creating, editing, disabling users, and device authorizations."],
-    ["MAIN_ADMIN", "roles", ".content", "User 3/15 (Main Admin): Visual Permission Matrix for dynamic RBAC control across all modules."],
-    ["MAIN_ADMIN", "security", ".content", "User 3/15 (Main Admin): Security & Device Approval Center."],
+    // USER 3: ENQUIRY OFFICER
+    ["ENQUIRY", "dashboard", ".content", "Enquiry Officer: Intake workspace for logging incoming client requests."],
+    ["ENQUIRY", "new-enquiry", "#enquiryIntakeForm", "Enquiry Officer: Creates new enquiries; system auto-assigns branch/TL/ASM."],
 
-    // USER 4: SECOND ADMIN
-    ["SECOND_ADMIN", "dashboard", ".content", "User 4/15 (Second Admin): Delegated Operational Control showing explicitly configured privileges."],
+    // USER 4: DESIGN TEAM LEADER (TL)
+    ["TL", "dashboard", ".content", "Design Team Leader (TL): Views and manages assigned leads for their own branch only."],
+    ["TL", "leads", ".content", "Design Team Leader (TL): Own-branch lead pipeline, design requirements, and consultation schedule."],
 
-    // USER 5: ENQUIRY OFFICER
-    ["ENQUIRY", "dashboard", ".content", "User 5/15 (Enquiry Officer): Intake Dashboard with today's metrics and auto-routing rules."],
-    ["ENQUIRY", "new-enquiry", "#enquiryIntakeForm", "User 5/15 (Enquiry Officer): Create New Enquiry form with auto-assignment to Branch, TL, ASM and 10-min SLA timer."],
+    // USER 5: ASSISTANT BRANCH MANAGER (ASM)
+    ["ASM", "dashboard", ".content", "Assistant Branch Manager (ASM): Manages follow-ups, meetings, and lead status for their own branch."],
+    ["ASM", "followups", ".content", "Assistant Branch Manager (ASM): Branch follow-up compliance, meeting logs, and lead status updates."],
 
-    // USER 6: DESIGN TEAM LEADER (TL)
-    ["TL", "dashboard", ".content", "User 6/15 (Design TL): Own-branch lead delivery, site visits, and consultation schedule."],
-    ["TL", "leads", ".content", "User 6/15 (Design TL): Assigned Leads workspace with requirement capture and client timeline."],
+    // USER 6: BRANCH MANAGER (BM)
+    ["BM", "dashboard", ".content", "Branch Manager: Full visibility of their own branch's performance."],
+    ["BM", "quotations", ".content", "Branch Manager: Own-branch sales conversion, team metrics, and quotation oversight."],
 
-    // USER 7: ASSISTANT BRANCH MANAGER (ASM)
-    ["ASM", "dashboard", ".content", "User 7/15 (ASM): Live 10-Minute SLA countdown widget (Green / Amber / Red response monitoring)."],
-    ["ASM", "followups", ".content", "User 7/15 (ASM): Immutable Follow-up History Log — historical entries cannot be altered or deleted."],
+    // USER 7: ACCOUNTS TEAM
+    ["ACCOUNTS", "dashboard", ".content", "Accounts Team: Access to job cards, payments, invoices, and balances (cross-branch)."],
+    ["ACCOUNTS", "payments", ".content", "Accounts Team: Cross-branch payment collection, milestone schedule, invoices, and receivables aging."],
 
-    // USER 8: BRANCH MANAGER (BM)
-    ["BM", "dashboard", ".content", "User 8/15 (Branch Manager): Permanently locked to own branch scope (no cross-branch access)."],
-    ["BM", "quotations", ".content", "User 8/15 (Branch Manager): Submit Quotation Revision Request to Main Admin for price adjustments."],
+    // USER 8: PROJECT TEAM
+    ["PROJECT", "dashboard", ".content", "Project Team (future phase): Access granted only after project/job card confirmation."],
+    ["PROJECT", "construction", ".content", "Project Team: Unlocked strictly for confirmed job cards & projects (11-stage construction progress)."],
 
-    // USER 9: MARKETING OFFICER (MO)
-    ["MO", "dashboard", ".content", "User 9/15 (Marketing Officer): Campaign lead intake, channel conversion performance, and enquiry surge alerts."],
+    // USER 9: MAIN ADMIN
+    ["MAIN_ADMIN", "dashboard", ".content", "Main Admin: Master System Administration, user controls, and security logs."],
+    ["MAIN_ADMIN", "roles", ".content", "Main Admin: Dynamic Role Access Level & Permissions Matrix."],
 
-    // USER 10: ACCOUNTS TEAM
-    ["ACCOUNTS", "dashboard", ".content", "User 10/15 (Accounts Team): Cross-branch financial dashboard with collection metrics."],
-    ["ACCOUNTS", "payments", ".content", "User 10/15 (Accounts Team): Standard 25% / 25% / 50% milestone collection logger and balance tracking."],
-    ["ACCOUNTS", "invoices", ".content", "User 10/15 (Accounts Team): Tax and GST invoice management."],
+    // USER 10: SECOND ADMIN
+    ["SECOND_ADMIN", "dashboard", ".content", "Second Admin: Delegated operational control and quotation approval queue."],
 
-    // USER 11: PROJECT TEAM
-    ["PROJECT", "dashboard", ".content", "User 11/15 (Project Team): Unlocked strictly after Job Card confirmation (sales enquiries hidden)."],
-    ["PROJECT", "construction", ".content", "User 11/15 (Project Team): 11-Stage Construction Progress Tracker with target completion dates."],
+    // USER 11: MARKETING OFFICER (MO)
+    ["MO", "dashboard", ".content", "Marketing Officer: Lead source campaign metrics and conversion analytics."],
 
     // USER 12: REAL ESTATE OFFICER
-    ["REAL_ESTATE", "dashboard", ".content", "User 12/15 (Real Estate Officer): Service-isolated dashboard (only Real Estate leads visible)."],
-    ["REAL_ESTATE", "enquiries", ".content", "User 12/15 (Real Estate Officer): Service-restricted enquiries table."],
+    ["REAL_ESTATE", "dashboard", ".content", "Real Estate Officer: Service-scoped real estate properties and land deals."],
 
     // USER 13: INTERIOR OFFICER
-    ["INTERIOR", "dashboard", ".content", "User 13/15 (Interior Officer): Service-isolated dashboard (only Interior fitout leads visible)."],
-    ["INTERIOR", "enquiries", ".content", "User 13/15 (Interior Officer): Service-restricted enquiries table."],
+    ["INTERIOR", "dashboard", ".content", "Interior Officer: Service-scoped interior fitout and design consultations."],
 
     // USER 14: A-GRADE MO
-    ["A_GRADE_MO", "dashboard", ".content", "User 14/15 (A-Grade MO): Package management workspace with full section modification rights."],
-    ["A_GRADE_MO", "packages", ".content", "User 14/15 (A-Grade MO): Editable package sections and MO approval capabilities."],
+    ["A_GRADE_MO", "packages", ".content", "A-Grade MO: Package configuration engine with full editing privileges."],
 
     // USER 15: D-GRADE MO
-    ["D_GRADE_MO", "dashboard", ".content", "User 15/15 (D-Grade MO): Basic marketing dashboard with restricted package controls."],
-    ["D_GRADE_MO", "packages", ".content", "User 15/15 (D-Grade MO): Restricted package sections locked with 🔒 tooltip."]
+    ["D_GRADE_MO", "packages", ".content", "D-Grade MO: Restricted package viewer with locked section controls."]
 ];
 
 let demoIndex = 0;
@@ -178,8 +170,8 @@ function refreshControlUI() {
     }
     if (autoPlayBtn) {
         autoPlayBtn.className = autoPlayEnabled 
-            ? "btn py-1 px-2 text-[11px] bg-emerald-700 text-white" 
-            : "btn py-1 px-2 text-[11px] bg-slate-700 text-slate-300";
+            ? "btn py-1 px-2 text-[11px] bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold" 
+            : "btn py-1 px-2 text-[11px] bg-slate-100 text-slate-700 border border-slate-300 font-medium";
         autoPlayBtn.textContent = autoPlayEnabled ? "Auto Play: ON (1 min)" : "Auto Play: OFF";
     }
     updateCountdownUI();
@@ -220,23 +212,23 @@ function spotlight(s) {
         </aside>
 
         <!-- BOTTOM CONTROL & PROGRESS BAR -->
-        <section class="demo-bar flex flex-col gap-2">
+        <section class="demo-bar flex flex-col gap-2 bg-white text-slate-900 border border-slate-200 shadow-2xl">
             <div class="flex justify-between items-center text-xs">
                 <div class="flex items-center gap-3">
-                    <span><b>USER DEMO TOUR:</b> ${ROLE_CONFIG[s[0]].label} (${demoIndex + 1}/${demoSteps.length})</span>
-                    <button id="demoAutoPlayBtn" onclick="toggleAutoPlay()" class="btn py-1 px-2 text-[11px] ${autoPlayEnabled ? "bg-emerald-700 text-white" : "bg-slate-700 text-slate-300"}">
+                    <span class="text-slate-900 font-semibold"><b>USER DEMO TOUR:</b> ${ROLE_CONFIG[s[0]].label} (${demoIndex + 1}/${demoSteps.length})</span>
+                    <button id="demoAutoPlayBtn" onclick="toggleAutoPlay()" class="btn py-1 px-2 text-[11px] ${autoPlayEnabled ? "bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold" : "bg-slate-100 text-slate-700 border border-slate-300 font-medium"}">
                         ${autoPlayEnabled ? "Auto Play: ON (1 min)" : "Auto Play: OFF"}
                     </button>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button class="text-slate-300 hover:text-white px-2 py-0.5 rounded bg-white/10 text-[11px]" onclick="prevDemoStep()" ${isFirstStep ? "disabled" : ""}>◄ Prev</button>
-                    <button class="text-slate-300 hover:text-white px-2 py-0.5 rounded bg-white/10 text-[11px]" onclick="nextDemoStep()">Next ►</button>
-                    <button class="text-blue-300 hover:text-white font-semibold ml-2 text-xs" onclick="exitDemo()">Exit Tour</button>
+                    <button class="text-slate-700 hover:text-slate-900 px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[11px] font-semibold" onclick="prevDemoStep()" ${isFirstStep ? "disabled" : ""}>◄ Prev</button>
+                    <button class="text-slate-700 hover:text-slate-900 px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[11px] font-semibold" onclick="nextDemoStep()">Next ►</button>
+                    <button class="text-red-600 hover:text-red-800 font-bold ml-2 text-xs" onclick="exitDemo()">Exit Tour</button>
                 </div>
             </div>
             <!-- ANIMATED COUNTDOWN PROGRESS BAR -->
-            <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden flex">
-                <div id="demoCountdownBar" class="bg-amber-400 h-full transition-all duration-1000 ease-linear" style="width:100%"></div>
+            <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden flex">
+                <div id="demoCountdownBar" class="bg-blue-600 h-full transition-all duration-1000 ease-linear" style="width:100%"></div>
             </div>
         </section>
     `;

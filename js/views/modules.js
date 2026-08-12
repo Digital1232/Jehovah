@@ -326,68 +326,212 @@ function enquiryFormView() {
     };
 }
 
-// LEADS TIMELINE VIEW
+// LEADS VIEW (MODULE 3 — DESIGN TL MODULE & MODULE 7 VOICE RECORDINGS & MODULE 8 TIMELINE)
+let activeLeadFilter = "All";
+
 function leadsView() {
     const rows = getScopedEnquiries();
-    const lead = rows[0] || state.enquiries[0];
+    const filteredRows = activeLeadFilter === "All" ? rows : rows.filter(x => x.status === activeLeadFilter);
+
+    const statusCounts = {
+        All: rows.length,
+        New: rows.filter(x => x.status === "New").length,
+        Contacted: rows.filter(x => x.status === "Contacted").length,
+        "Meeting Scheduled": rows.filter(x => x.status === "Meeting Scheduled" || x.status === "Meeting").length,
+        Quotation: rows.filter(x => x.status === "Quotation").length,
+        Converted: rows.filter(x => x.status === "Converted").length,
+        Hold: rows.filter(x => x.status === "Hold").length,
+        Cancelled: rows.filter(x => x.status === "Cancelled").length
+    };
 
     content.innerHTML = `
         <div class="page">
-            ${head("CLIENT TIMELINE & LEADS", lead.client, `
-                <button class="btn btn-outline text-xs" onclick="show('followups')"><i data-lucide="history" class="w-4 h-4"></i>Follow-up History</button>
-                ${canCreate("meetings") ? `<button class="btn btn-primary text-xs" onclick="show('meetings')">Schedule Meeting</button>` : ""}
+            ${head("DESIGN TL MODULE", "Assigned Lead Workspace", `
+                ${canCreate("enquiries") ? `<button class="btn btn-primary text-xs" onclick="show('new-enquiry')"><i data-lucide="plus" class="w-4 h-4"></i>New Lead</button>` : ""}
             `)}
-            <div class="grid lg:grid-cols-3 gap-6">
-                <section class="card p-6 lg:col-span-2">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="tag bg-blue-100 text-blue-800 text-xs font-semibold">${lead.service}</span>
-                            <h3 class="text-xl font-bold text-slate-900 mt-2">${lead.project}</h3>
-                            <p class="text-xs text-slate-500 mt-0.5">Enquiry ID: <span class="font-mono text-blue-600 font-bold">${lead.id}</span></p>
-                        </div>
-                        <span class="tag bg-emerald-100 text-emerald-800 text-xs">${lead.status}</span>
-                    </div>
 
-                    <div class="grid md:grid-cols-3 gap-4 mt-6 pt-5 border-t text-xs">
-                        <div><p class="label">Branch</p><b>${lead.branch}</b></div>
-                        <div><p class="label">Assigned TL</p><b>${lead.tl}</b></div>
-                        <div><p class="label">Assigned ASM</p><b>${lead.asm}</b></div>
-                        <div><p class="label">Estimated Value</p><b class="text-blue-600 text-sm">${money(lead.value)}</b></div>
-                        <div><p class="label">SLA Status</p><span class="tag bg-emerald-100 text-emerald-800">GREEN</span></div>
-                        <div><p class="label">Source</p><b>${lead.source}</b></div>
-                    </div>
-
-                    <div class="mt-8">
-                        <h3 class="font-bold text-slate-900 text-sm">Audit Activity Timeline</h3>
-                        <div class="mt-4 space-y-4 text-xs">
-                            ${[
-                                ["Enquiry Created & Auto-Assigned", "Auto Engine", "10 mins ago"],
-                                ["Assigned to Chennai Branch / Rajesh Kumar (TL)", "System Routing", "10 mins ago"],
-                                ["10-Minute Response SLA Timer Fired", "SLA Engine", "9 mins ago"],
-                                ["Client Call Initiated & Requirements Captured", "Senthil Nathan (ASM)", "5 mins ago"]
-                            ].map((x, i) => `
-                                <div class="flex gap-3">
-                                    <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 grid place-items-center font-bold text-[10px]">${i + 1}</span>
-                                    <div>
-                                        <strong class="text-slate-800 block text-xs">${x[0]}</strong>
-                                        <span class="text-[11px] text-slate-500">${x[1]} · ${x[2]}</span>
-                                    </div>
-                                </div>
-                            `).join("")}
-                        </div>
-                    </div>
-                </section>
-
-                <aside class="card p-6">
-                    <h3 class="font-bold text-slate-900 text-sm">Access Scope Info</h3>
-                    <div class="mt-4 p-4 rounded-xl bg-slate-50 border text-xs space-y-2">
-                        <div class="flex justify-between"><span class="text-slate-500">Current Role:</span><b>${ROLE_CONFIG[role].shortLabel}</b></div>
-                        <div class="flex justify-between"><span class="text-slate-500">Scoped Enquiries:</span><b class="text-blue-600">${rows.length} visible</b></div>
-                    </div>
-                </aside>
+            <!-- STATUS TAB FILTER (MODULE 3) -->
+            <div class="flex flex-wrap gap-2 mb-5 pb-3 border-b overflow-x-auto">
+                ${Object.keys(statusCounts).map(st => `
+                    <button class="btn ${activeLeadFilter === st ? "btn-primary" : "btn-outline"} text-xs py-1.5 px-3" onclick="activeLeadFilter='${st}';leadsView()">
+                        ${st} <span class="ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] ${activeLeadFilter === st ? "bg-white/20 text-white" : "bg-slate-100 text-slate-700"}">${statusCounts[st]}</span>
+                    </button>
+                `).join("")}
             </div>
+
+            <!-- LEADS TABLE -->
+            <section class="card overflow-x-auto">
+                ${filteredRows.length ? `
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Enquiry ID</th>
+                                <th>Client Name</th>
+                                <th>Service & Project</th>
+                                <th>Built-up Area & Rate</th>
+                                <th>Assigned TL / ASM</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filteredRows.map(x => `
+                                <tr>
+                                    <td><span class="font-mono font-bold text-xs text-blue-600">${x.id}</span></td>
+                                    <td><b>${x.client}</b><br><span class="label text-[11px]">${x.phone}</span></td>
+                                    <td><span class="tag bg-slate-100 text-slate-700">${x.service}</span><br><span class="text-xs text-slate-800 font-semibold">${x.project}</span></td>
+                                    <td><b class="text-slate-900">${x.area || "3,500 sq.ft"}</b><br><span class="label text-[10px] text-blue-700 font-semibold">${x.rate || "₹2,400/sq.ft"}</span></td>
+                                    <td><span class="text-xs text-slate-700 font-medium">${x.tl}</span><br><span class="label text-[10px]">${x.asm}</span></td>
+                                    <td>
+                                        <span class="tag ${x.status === "Converted" ? "bg-emerald-100 text-emerald-800" : x.status === "Cancelled" ? "bg-red-100 text-red-800" : x.status === "Hold" ? "bg-blue-100 text-blue-800" : "bg-amber-100 text-amber-800"} font-semibold">
+                                            ${x.status}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-outline py-1 px-2.5 text-xs" onclick="openLeadDetailModal('${x.id}')">Open Drawer</button>
+                                        ${x.status !== "Converted" ? `<button class="btn btn-primary py-1 px-2 text-xs ml-1" onclick="convertAction('${x.id}')">Convert</button>` : `<span class="tag bg-emerald-50 text-emerald-700 ml-1">JC Active</span>`}
+                                    </td>
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                ` : emptyState("No Leads in Selected Status", "There are no leads matching this filter.")}
+            </section>
         </div>
     `;
+}
+
+function convertAction(enqId) {
+    const jc = convertEnquiryToJobCard(enqId);
+    if (jc) {
+        toast(`Client Converted! Job Card ${jc.id} generated automatically.`, "check-circle");
+        show("jobcards");
+    }
+}
+
+// LEAD DETAIL DRAWER MODAL (MODULE 3, MODULE 7 VOICE RECORDING, MODULE 8 TIMELINE)
+function openLeadDetailModal(enqId) {
+    const lead = state.enquiries.find(x => x.id === enqId) || state.enquiries[0];
+    const recordings = lead.voiceRecordings || [];
+    const timeline = lead.timeline || [];
+
+    openModal(`
+        <div class="modal max-w-4xl p-6 space-y-6">
+            <div class="flex justify-between items-start pb-4 border-b">
+                <div>
+                    <span class="tag bg-blue-100 text-blue-800 text-xs font-semibold">${lead.service} · ${lead.branch}</span>
+                    <h2 class="text-2xl font-bold text-slate-900 mt-1">${lead.client} — ${lead.project}</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Enquiry ID: <span class="font-mono text-blue-600 font-bold">${lead.id}</span> · Phone: <b>${lead.phone}</b></p>
+                </div>
+                <button onclick="closeOverlay()" class="btn btn-outline p-1.5"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+
+            <!-- KEY CLIENT SPECS -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl text-xs border">
+                <div><span class="label">Built-up Area:</span><b class="block text-slate-900 font-bold text-sm mt-0.5">${lead.area || "3,500 sq.ft"}</b></div>
+                <div><span class="label">Unit Rate:</span><b class="block text-blue-600 font-bold text-sm mt-0.5">${lead.rate || "₹2,428/sq.ft"}</b></div>
+                <div><span class="label">Estimated Value:</span><b class="block text-emerald-700 font-bold text-sm mt-0.5">${money(lead.value)}</b></div>
+                <div><span class="label">Assigned TL:</span><b class="block text-slate-900 mt-0.5">${lead.tl}</b></div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- LEFT COLUMN: CRM DISCUSSION LOGGER (MODULE 3) & VOICE RECORDINGS (MODULE 7) -->
+                <div class="space-y-4">
+                    <section class="card p-4 border-blue-200 bg-blue-50/40">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-1.5"><i data-lucide="message-square-plus" class="w-4 h-4 text-blue-600"></i> Log Discussion directly in CRM</h3>
+                            <span class="tag bg-blue-100 text-blue-800 text-[10px]">No WhatsApp Needed</span>
+                        </div>
+                        <form id="discussionLogForm" class="space-y-3 text-xs">
+                            <div>
+                                <label class="label block mb-1">Meeting & Discussion Notes</label>
+                                <textarea id="discNotes" class="textarea h-16" placeholder="Enter notes from consultation..."></textarea>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="label block mb-1">Package Explained?</label>
+                                    <select id="discPkg" class="select"><option value="Yes">Yes ✓</option><option value="No">No ✕</option></select>
+                                </div>
+                                <div>
+                                    <label class="label block mb-1">Budget Discussed?</label>
+                                    <select id="discBgt" class="select"><option value="Yes">Yes ✓</option><option value="No">No ✕</option></select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="label block mb-1">Next Action Step</label>
+                                <input id="discNext" class="input" placeholder="e.g. Prepare 3D render layout" />
+                            </div>
+                            <div class="flex justify-between items-center pt-2">
+                                <button type="button" class="btn btn-outline text-xs py-1" onclick="toast('Voice Recording Uploaded & Attached to Record!', 'mic')">
+                                    <i data-lucide="mic" class="w-3.5 h-3.5 text-red-600"></i> Attach Voice Note
+                                </button>
+                                <button type="submit" class="btn btn-primary text-xs py-1.5 px-3">Save Discussion Log</button>
+                            </div>
+                        </form>
+                    </section>
+
+                    <!-- VOICE RECORDINGS PLAYER (MODULE 7) -->
+                    <section class="card p-4">
+                        <h3 class="font-bold text-slate-900 text-sm mb-3 flex items-center gap-1.5"><i data-lucide="volume-2" class="w-4 h-4 text-blue-600"></i> Voice & Call Recordings (${recordings.length})</h3>
+                        ${recordings.length ? `
+                            <div class="space-y-3 text-xs">
+                                ${recordings.map(r => `
+                                    <div class="p-3 rounded-xl bg-slate-50 border">
+                                        <div class="flex justify-between font-semibold text-slate-800">
+                                            <span>${r.title}</span>
+                                            <span class="text-slate-500 font-mono text-[11px]">${r.duration}</span>
+                                        </div>
+                                        <p class="text-[10px] text-slate-400 mt-0.5">Recorded: ${r.date}</p>
+                                        <audio controls class="w-full h-8 mt-2">
+                                            <source src="${r.src}" type="audio/mpeg">
+                                        </audio>
+                                    </div>
+                                `).join("")}
+                            </div>
+                        ` : `<p class="text-xs text-slate-500">No recordings uploaded yet. Attach voice notes above.</p>`}
+                    </section>
+                </div>
+
+                <!-- RIGHT COLUMN: CHRONOLOGICAL AUDIT TIMELINE (MODULE 8) -->
+                <div class="space-y-4">
+                    <section class="card p-4">
+                        <h3 class="font-bold text-slate-900 text-sm mb-3 flex items-center gap-1.5"><i data-lucide="history" class="w-4 h-4 text-blue-600"></i> Chronological History Trail (Module 8)</h3>
+                        <div class="space-y-3.5 text-xs max-h-[360px] overflow-y-auto pr-1">
+                            ${timeline.length ? timeline.map((ev, i) => `
+                                <div class="flex gap-3">
+                                    <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 font-bold grid place-items-center flex-shrink-0 text-[10px]">${i + 1}</div>
+                                    <div>
+                                        <b class="text-slate-800 block">${ev.title}</b>
+                                        <p class="text-[11px] text-slate-600">${ev.desc}</p>
+                                        <span class="text-[10px] text-slate-400 font-mono">${ev.time}</span>
+                                    </div>
+                                </div>
+                            `).join("") : `<p class="text-xs text-slate-500">No events logged.</p>`}
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <div class="pt-4 border-t flex justify-between items-center">
+                <button class="btn btn-outline text-xs" onclick="closeOverlay()">Close</button>
+                ${lead.status !== "Converted" ? `
+                    <button class="btn btn-primary text-xs py-2 px-4" onclick="closeOverlay();convertAction('${lead.id}')">Convert to Job Card (JC Number Generator)</button>
+                ` : `<span class="tag bg-emerald-100 text-emerald-800 font-bold">Converted to Job Card ✓</span>`}
+            </div>
+        </div>
+    `);
+
+    $("#discussionLogForm").onsubmit = e => {
+        e.preventDefault();
+        const notes = $("#discNotes").value || "Discussion logged.";
+        if (!lead.discussions) lead.discussions = [];
+        lead.discussions.push({ date: "Today", notes, packageExplained: true, budgetDiscussed: true, nextStep: $("#discNext").value });
+        if (!lead.timeline) lead.timeline = [];
+        lead.timeline.push({ time: "Just now", title: "Discussion Logged", desc: notes });
+        toast("Discussion notes & requirement logged in CRM!", "check-circle");
+        closeOverlay();
+        leadsView();
+    };
 }
 
 // MEETINGS VIEW
@@ -416,90 +560,160 @@ function meetingsView() {
     `;
 }
 
-// FOLLOW-UPS VIEW
+// FOLLOW-UPS VIEW (MODULE 4 — ASM FOLLOW-UP MODULE)
 function followupsView() {
     const isASM = role === "ASM";
+    const enqs = getScopedEnquiries();
+
+    // Check for follow-ups due today / tomorrow for automated reminders (Module 4)
+    const dueTodayOrTomorrow = enqs.filter(x => x.nextFollowup === "12 Aug 2026" || x.nextFollowup === "13 Aug 2026");
+
     content.innerHTML = `
         <div class="page">
-            ${head("SALES FOLLOW-UPS", "Follow-up Management", `
-                <button class="btn btn-primary text-xs" onclick="addFollowupModal()"><i data-lucide="plus" class="w-4 h-4"></i>Add New Follow-up</button>
+            ${head("ASM FOLLOW-UP MODULE", "Follow-up Compliance & Reminders", `
+                <button class="btn btn-primary text-xs" onclick="openASMUpdateModal()"><i data-lucide="plus" class="w-4 h-4"></i>Update Follow-up Record</button>
             `)}
-            <div class="grid lg:grid-cols-3 gap-5">
-                <section class="card p-5">
-                    <div class="flex justify-between items-center"><h3 class="font-bold text-xs uppercase text-red-600">OVERDUE</h3><span class="tag bg-red-100 text-red-800">02</span></div>
-                    <p class="mt-4 text-xs font-semibold text-slate-800">Nandhini Estates — Quotation Call</p>
-                </section>
-                <section class="card p-5">
-                    <div class="flex justify-between items-center"><h3 class="font-bold text-xs uppercase text-amber-600">DUE TODAY</h3><span class="tag bg-amber-100 text-amber-800">05</span></div>
-                    <p class="mt-4 text-xs font-semibold text-slate-800">John Mathews — Requirement Review</p>
-                </section>
-                <section class="card p-5">
-                    <div class="flex justify-between items-center"><h3 class="font-bold text-xs uppercase text-blue-600">UPCOMING</h3><span class="tag bg-blue-100 text-blue-800">12</span></div>
-                    <p class="mt-4 text-xs font-semibold text-slate-800">Dr. Swaminathan — Site Inspection</p>
-                </section>
-            </div>
 
-            <section class="card p-6 mt-6 max-w-4xl">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h3 class="font-bold text-slate-900">IMMUTABLE FOLLOW-UP HISTORY LOG</h3>
-                        <p class="label mt-0.5">Previous follow-up entries cannot be modified or deleted.</p>
-                    </div>
-                    ${isASM ? `<button class="btn btn-danger text-xs" onclick="restrictedHistoryAlert()">Attempt Edit Historical Entry</button>` : ""}
-                </div>
-                <div class="mt-6 space-y-4 text-xs">
-                    ${[
-                        ["12 Aug 2026 · 10:42 AM", "Senthil Nathan (ASM)", "Client requested quotation revision. Needs approval."],
-                        ["10 Aug 2026 · 03:15 PM", "Senthil Nathan (ASM)", "Initial phone discussion completed. Requirements noted."]
-                    ].map(x => `
-                        <div class="p-3 rounded-xl bg-slate-50 border">
-                            <div class="flex justify-between text-slate-500 font-mono text-[11px]">
-                                <span>${x[0]}</span>
-                                <b>${x[1]}</b>
-                            </div>
-                            <p class="text-slate-800 font-medium mt-1">${x[2]}</p>
+            <!-- AUTOMATIC REMINDERS BANNER (MODULE 4) -->
+            ${dueTodayOrTomorrow.length ? `
+                <div class="mb-5 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="bell-ring" class="w-5 h-5 text-amber-700 flex-shrink-0 animate-bounce"></i>
+                        <div>
+                            <b class="block text-slate-900 text-sm">AUTOMATIC FOLLOW-UP REMINDERS DUE TODAY / TOMORROW (${dueTodayOrTomorrow.length})</b>
+                            <span>Notifications dispatched automatically to assigned ASM so no enquiry is forgotten.</span>
                         </div>
-                    `).join("")}
+                    </div>
+                    <span class="tag bg-amber-200 text-amber-900 font-bold">${dueTodayOrTomorrow.length} Due Action</span>
                 </div>
+            ` : ""}
+
+            <!-- STATUS BADGES LEGEND (MODULE 4) -->
+            <section class="card p-4 mb-5">
+                <p class="label text-[11px] mb-2 uppercase font-bold">Status Badge Standard Codes:</p>
+                <div class="flex flex-wrap gap-2 text-xs">
+                    <span class="tag bg-slate-100 text-slate-700 font-semibold">New</span>
+                    <span class="tag bg-blue-100 text-blue-800 font-semibold">Contacted</span>
+                    <span class="tag bg-amber-100 text-amber-900 font-semibold">Follow-up</span>
+                    <span class="tag bg-purple-100 text-purple-800 font-semibold">Meeting</span>
+                    <span class="tag bg-indigo-100 text-indigo-800 font-semibold">Quotation</span>
+                    <span class="tag bg-slate-200 text-slate-800 font-semibold">Waiting</span>
+                    <span class="tag bg-emerald-100 text-emerald-800 font-semibold">✓ Converted (Green)</span>
+                    <span class="tag bg-red-100 text-red-800 font-semibold">✕ Cancelled (Red)</span>
+                    <span class="tag bg-blue-200 text-blue-900 font-semibold">⏸ Hold (Blue)</span>
+                </div>
+            </section>
+
+            <!-- FOLLOW-UPS TABLE -->
+            <section class="card overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Enquiry / Client</th>
+                            <th>Last Follow-up</th>
+                            <th>Next Follow-up</th>
+                            <th>Priority</th>
+                            <th>Status Badge</th>
+                            <th>Discussion Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${enqs.map(x => `
+                            <tr>
+                                <td>
+                                    <b class="text-slate-900">${x.client}</b><br>
+                                    <span class="font-mono text-xs text-blue-600">${x.id} · ${x.project}</span>
+                                </td>
+                                <td>${x.lastFollowup || "11 Aug 2026"}</td>
+                                <td><b class="${x.nextFollowup === "13 Aug 2026" ? "text-amber-700 font-bold" : ""}">${x.nextFollowup || "14 Aug 2026"}</b></td>
+                                <td>
+                                    <span class="tag ${x.priority === "High" ? "bg-red-100 text-red-800" : "bg-slate-100 text-slate-700"}">${x.priority}</span>
+                                </td>
+                                <td>
+                                    <span class="tag ${x.status === "Converted" ? "bg-emerald-100 text-emerald-800" : x.status === "Cancelled" ? "bg-red-100 text-red-800" : x.status === "Hold" ? "bg-blue-100 text-blue-800" : "bg-amber-100 text-amber-800"} font-bold">
+                                        ${x.status}
+                                    </span>
+                                </td>
+                                <td><p class="text-xs text-slate-700 max-w-xs truncate">${x.discussions && x.discussions.length ? x.discussions[0].notes : "Initial discussion recorded."}</p></td>
+                                <td>
+                                    <button class="btn btn-outline py-1 px-2.5 text-xs" onclick="openASMUpdateModal('${x.id}')">Update</button>
+                                </td>
+                            </tr>
+                        `).join("")}
+                    </tbody>
+                </table>
             </section>
         </div>
     `;
 }
 
-function restrictedHistoryAlert() {
+function openASMUpdateModal(enqId) {
+    const enq = state.enquiries.find(x => x.id === enqId) || state.enquiries[0];
     openModal(`
-        <div class="text-center p-4">
-            <div class="w-14 h-14 rounded-2xl mx-auto bg-red-50 text-red-600 grid place-items-center mb-3">
-                <i data-lucide="lock" class="w-8 h-8"></i>
+        <form id="asmUpdateForm" class="p-2 space-y-4 text-xs">
+            <h3 class="text-lg font-bold text-slate-900">Module 4 — ASM Follow-up Update</h3>
+            <p class="text-slate-500">Updating record for <b>${enq.client} (${enq.id})</b>. No re-entry required.</p>
+            
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="label block mb-1">Last Follow-up Date *</label>
+                    <input id="fLast" class="input" required value="12 Aug 2026" />
+                </div>
+                <div>
+                    <label class="label block mb-1">Next Follow-up Date *</label>
+                    <input id="fNext" class="input" required value="13 Aug 2026" />
+                </div>
             </div>
-            <h3 class="text-xl font-bold text-slate-900">Permission Restricted</h3>
-            <p class="text-xs text-slate-600 mt-2">
-                Historical CRM follow-up records are immutable for Assistant Branch Managers (ASM). You can only append NEW follow-up entries.
-            </p>
-            <button class="btn btn-primary w-full mt-6" onclick="closeOverlay();addFollowupModal()">Add New Follow-up Entry</button>
-        </div>
-    `);
-}
+            
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="label block mb-1">Status Badge Code *</label>
+                    <select id="fStatus" class="select">
+                        <option ${enq.status === "New" ? "selected" : ""}>New</option>
+                        <option ${enq.status === "Contacted" ? "selected" : ""}>Contacted</option>
+                        <option ${enq.status === "Follow-up" ? "selected" : ""}>Follow-up</option>
+                        <option ${enq.status === "Meeting Scheduled" ? "selected" : ""}>Meeting Scheduled</option>
+                        <option ${enq.status === "Quotation" ? "selected" : ""}>Quotation</option>
+                        <option ${enq.status === "Waiting" ? "selected" : ""}>Waiting</option>
+                        <option ${enq.status === "Converted" ? "selected" : ""}>Converted</option>
+                        <option ${enq.status === "Cancelled" ? "selected" : ""}>Cancelled</option>
+                        <option ${enq.status === "Hold" ? "selected" : ""}>Hold</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="label block mb-1">Priority Level *</label>
+                    <select id="fPriority" class="select">
+                        <option>High</option>
+                        <option>Medium</option>
+                        <option>Low</option>
+                    </select>
+                </div>
+            </div>
 
-function addFollowupModal() {
-    openModal(`
-        <form id="followupForm" class="p-2 space-y-4">
-            <h3 class="text-lg font-bold text-slate-900">Add New Follow-up Entry</h3>
             <div>
-                <label class="label block mb-1">Follow-up Outcome & Action</label>
-                <input id="fOutcome" class="input" required value="Client requested revised quotation with premium fixtures." />
+                <label class="label block mb-1">Discussion Notes *</label>
+                <textarea id="fNotes" class="textarea h-20" required>Followed up with client. Confirmed budget approval meeting scheduled for tomorrow.</textarea>
             </div>
-            <div class="pt-4 flex justify-end gap-2">
+
+            <div class="pt-3 border-t flex justify-end gap-2">
                 <button type="button" class="btn btn-outline text-xs" onclick="closeOverlay()">Cancel</button>
-                <button type="submit" class="btn btn-primary text-xs">Save Follow-up</button>
+                <button type="submit" class="btn btn-primary text-xs">Save Follow-up Record</button>
             </div>
         </form>
     `);
-    $("#followupForm").onsubmit = e => {
+
+    $("#asmUpdateForm").onsubmit = e => {
         e.preventDefault();
+        enq.lastFollowup = $("#fLast").value;
+        enq.nextFollowup = $("#fNext").value;
+        enq.status = $("#fStatus").value;
+        enq.priority = $("#fPriority").value;
+        if (!enq.discussions) enq.discussions = [];
+        enq.discussions.unshift({ date: "Today", notes: $("#fNotes").value });
         closeOverlay();
-        toast("New follow-up entry appended to historical log.", "history");
-        show("followups");
+        toast("ASM Follow-up updated! Automatic reminder set.", "check-circle");
+        followupsView();
     };
 }
 
@@ -569,7 +783,7 @@ function quotationsView() {
                                 ${state.revisionApproved ? "Revision Approved ✓" : "Submit Revision Request (BM → Admin)"}
                             </button>
                         ` : `
-                            <button class="btn btn-primary w-full py-2.5 text-xs" onclick="show('jobcards')">Convert to Job Card</button>
+                            <button class="btn btn-primary w-full py-2.5 text-xs" onclick="convertAction('ENQ-1001')">Convert to Job Card (Auto JC Number)</button>
                         `}
                     </div>
                 </aside>
@@ -625,22 +839,25 @@ function packagesView() {
     `;
 }
 
-// JOB CARDS VIEW
+// JOB CARDS VIEW (MODULE 5 — JOB CARD MODULE & PAYMENT TRACKING)
 function jobcardsView() {
     const list = getScopedJobCards();
     content.innerHTML = `
         <div class="page">
-            ${head("OPERATIONAL JOB CARDS", "Active Job Cards", "")}
+            ${head("MODULE 5 — JOB CARD MODULE", "Confirmed Job Cards", "")}
             <section class="card overflow-x-auto">
                 <table class="table">
                     <thead>
                         <tr>
                             <th>Job Card #</th>
                             <th>Client Name</th>
-                            <th>Project</th>
-                            <th>Branch</th>
-                            <th>Project Value</th>
-                            <th>Status</th>
+                            <th>Package</th>
+                            <th>Built-up Area & Rate</th>
+                            <th>Total Cost</th>
+                            <th>Advance Paid</th>
+                            <th>Balance</th>
+                            <th>Delivery Date</th>
+                            <th>Completion %</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -648,13 +865,21 @@ function jobcardsView() {
                         ${list.map(x => `
                             <tr>
                                 <td><span class="font-mono font-bold text-xs text-blue-600">${x.id}</span></td>
-                                <td><b>${x.client}</b></td>
-                                <td>${x.project}</td>
-                                <td>${x.branch}</td>
-                                <td class="font-bold">${money(x.value)}</td>
-                                <td><span class="tag bg-emerald-100 text-emerald-800">${x.status}</span></td>
+                                <td><b>${x.client}</b><br><span class="label text-[11px]">${x.branch}</span></td>
+                                <td><span class="tag bg-blue-50 text-blue-700">${x.package || "Package 2 — Premium"}</span></td>
+                                <td><b>${x.area || "3,500 sq.ft"}</b><br><span class="label text-[10px] text-blue-700">${x.rate || "₹2,428/sq.ft"}</span></td>
+                                <td class="font-bold text-slate-900">${money(x.totalCost || x.value)}</td>
+                                <td class="text-emerald-700 font-bold">${money(x.advancePaid || (x.value * 0.25))}</td>
+                                <td class="text-amber-800 font-bold">${money(x.balance || (x.value * 0.5))}</td>
+                                <td>${x.deliveryDate || x.promisedDate}</td>
                                 <td>
-                                    <button class="btn btn-outline py-1 px-2.5 text-xs" onclick="show('projects')">Open Project</button>
+                                    <div class="flex items-center gap-2">
+                                        <div class="progress w-16"><span style="width:${x.progress}%"></span></div>
+                                        <b class="text-xs text-blue-600">${x.progress}%</b>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="btn btn-outline py-1 px-2.5 text-xs" onclick="openJobCardPaymentModal('${x.id}')">Payments</button>
                                 </td>
                             </tr>
                         `).join("")}
@@ -663,6 +888,46 @@ function jobcardsView() {
             </section>
         </div>
     `;
+}
+
+function openJobCardPaymentModal(jcId) {
+    const jc = state.jobCards.find(x => x.id === jcId) || state.jobCards[0];
+    openModal(`
+        <div class="p-4 space-y-4 text-xs">
+            <div class="flex justify-between items-start pb-3 border-b">
+                <div>
+                    <span class="tag bg-blue-100 text-blue-800 text-xs font-semibold">${jc.id} · ${jc.branch}</span>
+                    <h3 class="text-xl font-bold text-slate-900 mt-1">${jc.client} — ${jc.project}</h3>
+                </div>
+                <button onclick="closeOverlay()" class="btn btn-outline p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+
+            <!-- PAYMENT MILESTONE TRACKING -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="p-3 rounded-xl bg-slate-50 border">
+                    <span class="label">Total Cost:</span>
+                    <b class="block text-slate-900 text-base mt-1">${money(jc.totalCost || jc.value)}</b>
+                </div>
+                <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200">
+                    <span class="label text-emerald-800">Advance Paid (25%):</span>
+                    <b class="block text-emerald-800 text-base mt-1">${money(jc.advancePaid || (jc.value * 0.25))}</b>
+                </div>
+                <div class="p-3 rounded-xl bg-blue-50 border border-blue-200">
+                    <span class="label text-blue-800">2nd Payment (25%):</span>
+                    <b class="block text-blue-800 text-base mt-1">${money(jc.secondPayment || (jc.value * 0.25))}</b>
+                </div>
+                <div class="p-3 rounded-xl bg-amber-50 border border-amber-200">
+                    <span class="label text-amber-800">Pending Amount:</span>
+                    <b class="block text-amber-900 text-base mt-1">${money(jc.balance || (jc.value * 0.5))}</b>
+                </div>
+            </div>
+
+            <div class="pt-3 flex justify-between items-center border-t">
+                <span class="text-slate-500 font-medium">Promised Delivery Date: <b>${jc.deliveryDate || jc.promisedDate}</b></span>
+                <button class="btn btn-primary text-xs" onclick="closeOverlay();recordPaymentAction();">Record Stage Payment</button>
+            </div>
+        </div>
+    `);
 }
 
 // PAYMENTS VIEW
@@ -799,21 +1064,33 @@ function approveRevisionAction() {
     show("approvals");
 }
 
-// NOTIFICATIONS VIEW
+// NOTIFICATIONS VIEW (MODULE 9 — SYSTEM PUSH NOTIFICATIONS)
 function notificationsView() {
-    const list = ROLE_CONFIG[role].notifications || [];
+    const list = state.notifications || [];
     content.innerHTML = `
         <div class="page">
-            ${head("NOTIFICATIONS", "Role Notifications Queue")}
+            ${head("MODULE 9 — SYSTEM NOTIFICATIONS", "Push Notifications Queue", `
+                <button class="btn btn-outline text-xs" onclick="state.notifications.forEach(n=>n.unread=false);notificationsView();toast('All notifications marked read.', 'check-check')">Mark All Read</button>
+            `)}
             <section class="card overflow-x-auto">
                 <table class="table">
-                    <thead><tr><th>Time</th><th>Notification Event</th><th>Category</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Time</th>
+                            <th>Notification Title</th>
+                            <th>Details</th>
+                            <th>Category</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        ${list.map((n, i) => `
-                            <tr>
-                                <td class="text-slate-500 text-xs">${10 - i}:00 AM</td>
-                                <td><b>${n}</b></td>
-                                <td><span class="tag bg-blue-50 text-blue-700">Role Workflow</span></td>
+                        ${list.map(n => `
+                            <tr class="${n.unread ? "bg-blue-50/40" : ""}">
+                                <td>${n.unread ? '<span class="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block"></span>' : '<span class="text-slate-300">✓</span>'}</td>
+                                <td class="text-slate-500 font-mono text-xs">${n.time}</td>
+                                <td><b class="text-slate-900">${n.title}</b></td>
+                                <td><p class="text-xs text-slate-700">${n.detail}</p></td>
+                                <td><span class="tag bg-blue-100 text-blue-800 uppercase text-[10px] font-bold">${n.type}</span></td>
                             </tr>
                         `).join("")}
                     </tbody>
@@ -823,23 +1100,165 @@ function notificationsView() {
     `;
 }
 
-// REPORTS & ANALYTICS VIEW
+// REPORTS & ANALYTICS VIEW (MODULE 6 & 20 ANALYTICS REPORTS & ADDITIONAL KPIS)
+let activeReportTab = "MONTHLY_COUNTING";
+
 function reportsView() {
-    const reportsList = ROLE_CONFIG[role].reports || [];
     content.innerHTML = `
         <div class="page">
-            ${head("AUTHORIZED REPORTS", "Reports & Analytics")}
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                ${reportsList.map(r => `
-                    <section class="card p-5">
-                        <i data-lucide="file-bar-chart" class="w-6 h-6 text-blue-600 mb-2"></i>
-                        <h3 class="font-bold text-slate-900 text-sm">${r}</h3>
-                        <p class="text-xs text-slate-500 mt-1">Export role-scoped reporting data.</p>
-                        <button class="btn btn-secondary text-xs mt-4 w-full" onclick="toast('${r} Report Generated.', 'file-text')">Generate Report</button>
-                    </section>
+            ${head("ANALYTICS & REPORTING ENGINE", "20 Executive Dashboards & Reports", `
+                <button class="btn btn-primary text-xs" onclick="toast('Full Executive Reporting Bundle Exported!', 'download')"><i data-lucide="download" class="w-4 h-4"></i>Export Report Bundle</button>
+            `)}
+
+            <!-- ADDITIONAL KPIS STRIP -->
+            <section class="card p-4 mb-6 bg-gradient-to-r from-blue-50 via-slate-50 to-indigo-50 text-slate-900 shadow-sm border border-blue-200">
+                <span class="tag bg-blue-100 text-blue-900 border border-blue-300 text-[10px] uppercase font-bold tracking-widest mb-3 inline-block">EXECUTIVE PERFORMANCE KPIS</span>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 text-center">
+                    <div class="p-2.5 rounded-xl bg-white border border-blue-200/80 shadow-sm">
+                        <span class="text-[10px] text-slate-600 font-extrabold block uppercase">Lead Response Time</span>
+                        <strong class="text-base text-emerald-700 font-extrabold mt-0.5 block">8.4 Mins</strong>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-white border border-blue-200/80 shadow-sm">
+                        <span class="text-[10px] text-slate-600 font-extrabold block uppercase">Meeting → Conv %</span>
+                        <strong class="text-base text-emerald-700 font-extrabold mt-0.5 block">42%</strong>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-white border border-blue-200/80 shadow-sm">
+                        <span class="text-[10px] text-slate-600 font-extrabold block uppercase">Site Visit → Conv %</span>
+                        <strong class="text-base text-emerald-700 font-extrabold mt-0.5 block">68%</strong>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-white border border-blue-200/80 shadow-sm">
+                        <span class="text-[10px] text-slate-600 font-extrabold block uppercase">Reactivation Rate</span>
+                        <strong class="text-base text-amber-700 font-extrabold mt-0.5 block">14%</strong>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-white border border-blue-200/80 shadow-sm">
+                        <span class="text-[10px] text-slate-600 font-extrabold block uppercase">Repeat Client Rate</span>
+                        <strong class="text-base text-blue-700 font-extrabold mt-0.5 block">22%</strong>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-white border border-blue-200/80 shadow-sm">
+                        <span class="text-[10px] text-slate-600 font-extrabold block uppercase">Top Rev / Source</span>
+                        <strong class="text-base text-emerald-700 font-extrabold mt-0.5 block">Referral</strong>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-white border border-blue-200/80 shadow-sm">
+                        <span class="text-[10px] text-slate-600 font-extrabold block uppercase">Top Rev / Branch</span>
+                        <strong class="text-base text-emerald-700 font-extrabold mt-0.5 block">Chennai</strong>
+                    </div>
+                </div>
+            </section>
+
+            <!-- REPORT SELECTION TAB BAR -->
+            <div class="flex flex-wrap gap-2 mb-6 pb-3 border-b overflow-x-auto">
+                ${[
+                    ["MONTHLY_COUNTING", "Module 6: Monthly Counting"],
+                    ["ENQUIRY_ANALYTICS", "1. Enquiry Analytics"],
+                    ["CONVERSION_ANALYTICS", "2. Conversion Analytics"],
+                    ["BRANCH_PERFORMANCE", "3. Branch Performance"],
+                    ["TEAM_PERFORMANCE", "4. Team Performance"],
+                    ["LEAD_SOURCE", "5. Lead Source Analytics"],
+                    ["SERVICE_ANALYTICS", "6. Service Analytics"],
+                    ["RES_VS_COMM", "7. Residential vs Commercial"],
+                    ["LOCATION_ANALYTICS", "8. Location Analytics"],
+                    ["PROJECT_SIZE", "9. Project Size Analytics"],
+                    ["PACKAGE_ANALYTICS", "10. Package Analytics"],
+                    ["FOLLOWUP_AGEING", "11. Follow-up Ageing & Analytics"],
+                    ["LOST_ENQUIRY", "13. Lost Enquiry Report"],
+                    ["FORECAST", "16. Forecast Dashboard"],
+                    ["EXECUTIVE_DASH", "20. Executive Dashboard"]
+                ].map(tab => `
+                    <button class="btn ${activeReportTab === tab[0] ? "btn-primary" : "btn-outline"} text-xs py-1.5 px-3" onclick="activeReportTab='${tab[0]}';reportsView()">
+                        ${tab[1]}
+                    </button>
                 `).join("")}
             </div>
+
+            <!-- TAB CONTENT RENDERER -->
+            ${renderReportTabContent()}
         </div>
+    `;
+}
+
+function renderReportTabContent() {
+    if (activeReportTab === "MONTHLY_COUNTING") {
+        return `
+            <section class="card p-6 space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">MODULE 6 — MONTHLY COUNTING DASHBOARD</h3>
+                        <p class="label mt-0.5">Auto-calculated monthly performance metrics per branch</p>
+                    </div>
+                    <select class="select w-48 text-xs"><option>Chennai Branch</option><option>Coimbatore Branch</option></select>
+                </div>
+                <div class="grid grid-cols-2 lg:grid-cols-6 gap-3 text-center text-xs">
+                    <div class="p-3.5 rounded-xl bg-slate-50 border"><span class="label block">Total Enquiries</span><strong class="text-xl font-bold text-slate-900 block mt-1">128</strong></div>
+                    <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200"><span class="label block text-emerald-800">Converted</span><strong class="text-xl font-bold text-emerald-800 block mt-1">31</strong></div>
+                    <div class="p-3.5 rounded-xl bg-red-50 border border-red-200"><span class="label block text-red-800">Cancelled</span><strong class="text-xl font-bold text-red-800 block mt-1">12</strong></div>
+                    <div class="p-3.5 rounded-xl bg-blue-50 border border-blue-200"><span class="label block text-blue-800">On Hold</span><strong class="text-xl font-bold text-blue-800 block mt-1">14</strong></div>
+                    <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-200"><span class="label block text-amber-900">Running Follow-ups</span><strong class="text-xl font-bold text-amber-900 block mt-1">71</strong></div>
+                    <div class="p-3.5 rounded-xl bg-emerald-100 border border-emerald-300"><span class="label block text-emerald-950">Conversion Rate</span><strong class="text-xl font-bold text-emerald-950 block mt-1">24.2%</strong></div>
+                </div>
+
+                <!-- LEAD SOURCE BREAKDOWN CHARTS (MODULE 6) -->
+                <div>
+                    <h4 class="font-bold text-slate-900 text-sm mb-3">Lead Source Breakdown</h4>
+                    <div class="space-y-3 text-xs">
+                        ${[
+                            ["Google Search / Ads", "38 Enquiries", "30%", "#2563eb"],
+                            ["Referral / Repeat Clients", "32 Enquiries", "25%", "#16a34a"],
+                            ["Website Direct", "24 Enquiries", "19%", "#7c3aed"],
+                            ["WhatsApp Business", "18 Enquiries", "14%", "#059669"],
+                            ["Walk-in & Exhibition", "16 Enquiries", "12%", "#d97706"]
+                        ].map(s => `
+                            <div>
+                                <div class="flex justify-between font-semibold mb-1">
+                                    <span class="text-slate-800">${s[0]}</span>
+                                    <span class="text-slate-600">${s[1]} (${s[2]})</span>
+                                </div>
+                                <div class="progress"><span style="width:${s[2]};background:${s[3]}"></span></div>
+                            </div>
+                        `).join("")}
+                    </div>
+                </div>
+            </section>
+        `;
+    }
+
+    if (activeReportTab === "ENQUIRY_ANALYTICS") {
+        return `
+            <section class="card p-6 space-y-6">
+                <h3 class="text-lg font-bold text-slate-900">1. Enquiry Analytics Dashboard</h3>
+                <p class="label">Daily, weekly, monthly, and yearly enquiry trends by branch & hour-wise distribution</p>
+                <div class="grid md:grid-cols-4 gap-4 text-xs">
+                    <div class="p-4 rounded-xl bg-slate-50 border"><span class="label">Daily Intake</span><b class="block text-lg font-bold mt-1 text-blue-600">16 / day</b></div>
+                    <div class="p-4 rounded-xl bg-slate-50 border"><span class="label">Weekly Intake</span><b class="block text-lg font-bold mt-1 text-blue-600">112 / week</b></div>
+                    <div class="p-4 rounded-xl bg-slate-50 border"><span class="label">Monthly Intake</span><b class="block text-lg font-bold mt-1 text-blue-600">480 / month</b></div>
+                    <div class="p-4 rounded-xl bg-slate-50 border"><span class="label">Peak Hour</span><b class="block text-lg font-bold mt-1 text-blue-600">10:00 AM – 12:00 PM</b></div>
+                </div>
+            </section>
+        `;
+    }
+
+    if (activeReportTab === "FOLLOWUP_AGEING") {
+        return `
+            <section class="card p-6 space-y-6">
+                <h3 class="text-lg font-bold text-slate-900">12. Follow-up Ageing Buckets</h3>
+                <p class="label">Distribution of active enquiries by follow-up age</p>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-center text-xs">
+                    <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200"><span class="label text-emerald-800">0 – 7 Days</span><strong class="block text-xl font-bold text-emerald-800 mt-1">42 Leads</strong></div>
+                    <div class="p-4 rounded-xl bg-blue-50 border border-blue-200"><span class="label text-blue-800">8 – 15 Days</span><strong class="block text-xl font-bold text-blue-800 mt-1">18 Leads</strong></div>
+                    <div class="p-4 rounded-xl bg-amber-50 border border-amber-200"><span class="label text-amber-900">16 – 30 Days</span><strong class="block text-xl font-bold text-amber-900 mt-1">9 Leads</strong></div>
+                    <div class="p-4 rounded-xl bg-orange-50 border border-orange-200"><span class="label text-orange-900">31 – 60 Days</span><strong class="block text-xl font-bold text-orange-900 mt-1">4 Leads</strong></div>
+                    <div class="p-4 rounded-xl bg-red-50 border border-red-200"><span class="label text-red-800">60+ Days</span><strong class="block text-xl font-bold text-red-800 mt-1">2 Leads</strong></div>
+                </div>
+            </section>
+        `;
+    }
+
+    return `
+        <section class="card p-6 text-center py-12">
+            <i data-lucide="file-bar-chart-2" class="w-10 h-10 mx-auto text-blue-600 mb-3"></i>
+            <h3 class="text-lg font-bold text-slate-900">Report Engine Generated: ${activeReportTab.replace(/_/g, ' ')}</h3>
+            <p class="text-xs text-slate-500 max-w-md mx-auto mt-1">Fully configured live CRM reporting analytics active for enterprise export.</p>
+            <button class="btn btn-primary text-xs mt-4" onclick="toast('Report data exported to CSV/Excel.', 'file-spreadsheet')">Export Excel Report</button>
+        </section>
     `;
 }
 
@@ -908,24 +1327,54 @@ function branchesView() {
 
 // ROLES & PERMISSIONS MATRIX VIEW
 function rolesMatrixView() {
+    const primaryRoleKeys = ["MD", "HEAD_OFFICE_ADMIN", "ENQUIRY", "TL", "ASM", "BM", "ACCOUNTS", "PROJECT"];
+    const allRoles = Object.values(ROLE_CONFIG);
+
     content.innerHTML = `
         <div class="page">
-            ${head("ROLE ACCESS CONTROL", "Visual Permission Matrix")}
+            ${head("ROLE ACCESS CONTROL", "Enterprise Role Access Level Matrix", `
+                <span class="tag bg-blue-100 text-blue-800 text-xs font-semibold">8 Core Role Models Active</span>
+            `)}
             <section class="card overflow-x-auto">
                 <table class="table">
-                    <thead><tr><th>Role</th><th>Branch Scope</th><th>View</th><th>Create</th><th>Edit</th><th>Approve</th><th>Export</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Role & Title</th>
+                            <th class="min-w-[280px]">Role Access Level & Description</th>
+                            <th>Branch Scope</th>
+                            <th class="text-center">View</th>
+                            <th class="text-center">Create</th>
+                            <th class="text-center">Edit</th>
+                            <th class="text-center">Approve</th>
+                            <th class="text-center">Export</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        ${Object.values(ROLE_CONFIG).map(x => `
-                            <tr>
-                                <td><b>${x.shortLabel}</b></td>
-                                <td>${x.branchScope}</td>
-                                <td>✓</td>
-                                <td>${x.permissions.some(p => p.includes("create") || p === "*") ? "✓" : "✕"}</td>
-                                <td>${x.id === "ASM" ? "Restricted" : "✓"}</td>
-                                <td>${x.permissions.some(p => p.includes("approve") || p === "*") ? "✓" : "✕"}</td>
-                                <td>${x.id === "ASM" ? "🔒 Prohibited" : "✓"}</td>
-                            </tr>
-                        `).join("")}
+                        ${allRoles.map(x => {
+                            const isPrimary = primaryRoleKeys.includes(x.id);
+                            return `
+                                <tr class="${isPrimary ? "bg-blue-50/30" : ""}">
+                                    <td>
+                                        <b class="text-slate-900 font-semibold block text-xs">${x.label}</b>
+                                        <span class="text-[10px] text-slate-500 font-medium">${x.department}</span>
+                                        ${isPrimary ? '<span class="tag bg-blue-100 text-blue-800 text-[9px] uppercase mt-1">Core Role</span>' : ''}
+                                    </td>
+                                    <td>
+                                        <p class="text-xs text-slate-700 leading-snug font-medium">${x.description || "Custom role configuration"}</p>
+                                    </td>
+                                    <td>
+                                        <span class="tag ${x.branchScope === "GLOBAL" ? "bg-purple-100 text-purple-800" : x.branchScope === "BRANCH" ? "bg-amber-100 text-amber-900" : x.branchScope === "FINANCIAL" ? "bg-emerald-100 text-emerald-800" : "bg-slate-100 text-slate-700"}">
+                                            ${x.branchScope}
+                                        </span>
+                                    </td>
+                                    <td class="text-center text-emerald-600 font-bold">✓</td>
+                                    <td class="text-center">${x.permissions.some(p => p.includes("create") || p === "*") ? '<span class="text-emerald-600 font-bold">✓</span>' : '<span class="text-slate-300">✕</span>'}</td>
+                                    <td class="text-center">${x.id === "ASM" ? '<span class="tag bg-amber-50 text-amber-700 text-[10px]">Restricted</span>' : x.permissions.some(p => p.includes("update") || p.includes("edit") || p === "*") ? '<span class="text-emerald-600 font-bold">✓</span>' : '<span class="text-slate-300">✕</span>'}</td>
+                                    <td class="text-center">${x.permissions.some(p => p.includes("approve") || p === "*") ? '<span class="text-emerald-600 font-bold">✓</span>' : '<span class="text-slate-300">✕</span>'}</td>
+                                    <td class="text-center">${x.id === "ASM" ? '<span class="tag bg-red-50 text-red-700 text-[10px]">🔒 Prohibited</span>' : '<span class="text-emerald-600 font-bold">✓</span>'}</td>
+                                </tr>
+                            `;
+                        }).join("")}
                     </tbody>
                 </table>
             </section>
@@ -984,19 +1433,27 @@ function settingsView() {
 
 // DEMO CENTER VIEW
 function demoCenterView() {
-    content.innerHTML = `
+    return content.innerHTML = `
         <div class="page">
             ${head("ROLE-BASED CLIENT DEMO", "Guided Role Tour Center", `
                 <button class="btn btn-primary text-xs" onclick="startRoleDemo()"><i data-lucide="play-circle" class="w-4 h-4"></i>Start Guided Demo Tour</button>
             `)}
-            <div class="grid md:grid-cols-3 gap-4">
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 ${Object.values(ROLE_CONFIG).map(r => `
-                    <div class="card p-5 flex flex-col justify-between">
+                    <div class="card p-5 flex flex-col justify-between hover:border-blue-300 transition-colors">
                         <div>
-                            <h3 class="font-bold text-slate-900 text-sm">${r.label}</h3>
-                            <p class="text-xs text-slate-500 mt-1">${r.department} · ${r.branchScope} Scope</p>
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-slate-900 text-sm">${r.label}</h3>
+                                <span class="tag ${r.branchScope === "GLOBAL" ? "bg-purple-100 text-purple-800" : r.branchScope === "BRANCH" ? "bg-amber-100 text-amber-900" : "bg-slate-100 text-slate-700"} text-[10px]">
+                                    ${r.branchScope}
+                                </span>
+                            </div>
+                            <p class="text-xs text-slate-500 font-medium mt-0.5">${r.department}</p>
+                            <div class="mt-3 p-2.5 rounded-lg bg-slate-50 border text-xs text-slate-700 leading-snug">
+                                <b>Access Level:</b> ${r.description}
+                            </div>
                         </div>
-                        <button class="btn btn-secondary text-xs mt-4 w-full" onclick="switchRole('${r.id}')">View Role Dashboard</button>
+                        <button class="btn btn-secondary text-xs mt-4 w-full" onclick="switchRole('${r.id}')">Switch to ${r.shortLabel} View</button>
                     </div>
                 `).join("")}
             </div>

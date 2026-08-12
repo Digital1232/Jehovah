@@ -93,7 +93,7 @@ function renderNav() {
 
     const cfg = ROLE_CONFIG[role];
     $("#roleSidebar").textContent = cfg.shortLabel;
-    $("#sidebarScope").textContent = (cfg.branchScope === "BRANCH") ? "Chennai Branch Scope" : `${cfg.department} Scope`;
+    $("#sidebarScope").innerHTML = `<b class="text-blue-300 font-semibold">${cfg.branchScope} SCOPE</b><span class="block text-[10px] text-slate-400 mt-0.5 leading-tight font-normal">${cfg.description}</span>`;
 
     renderMobileNav();
     icons();
@@ -113,9 +113,23 @@ function renderMobileNav() {
 }
 
 function renderControls() {
-    $("#roleSelect").innerHTML = Object.entries(ROLE_CONFIG).map(([id, c]) => `
-        <option value="${id}" ${role === id ? "selected" : ""}>${c.shortLabel}</option>
-    `).join("");
+    const primaryKeys = ["MD", "HEAD_OFFICE_ADMIN", "ENQUIRY", "TL", "ASM", "BM", "ACCOUNTS", "PROJECT"];
+    const secondaryKeys = Object.keys(ROLE_CONFIG).filter(k => !primaryKeys.includes(k));
+
+    $("#roleSelect").innerHTML = `
+        <optgroup label="── 8 PRIMARY CORE ROLES ──">
+            ${primaryKeys.map(id => {
+                const c = ROLE_CONFIG[id];
+                return `<option value="${id}" ${role === id ? "selected" : ""}>${c.shortLabel} — ${c.label}</option>`;
+            }).join("")}
+        </optgroup>
+        <optgroup label="── ADDITIONAL & SPECIALIZED ROLES ──">
+            ${secondaryKeys.map(id => {
+                const c = ROLE_CONFIG[id];
+                return `<option value="${id}" ${role === id ? "selected" : ""}>${c.shortLabel} — ${c.label}</option>`;
+            }).join("")}
+        </optgroup>
+    `;
 
     const cfg = ROLE_CONFIG[role];
     const isGlobalBranch = cfg.branchScope === "GLOBAL" || cfg.branchScope === "FINANCIAL";
@@ -162,7 +176,7 @@ function switchRole(nextRole) {
 
     renderControls();
     show("dashboard");
-    toast(`Switched View As: ${cfg.label}`, "shield-check");
+    toast(`${cfg.shortLabel}: ${cfg.description}`, "shield-check");
 }
 
 // Global Search Handler
