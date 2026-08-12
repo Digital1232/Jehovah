@@ -1,5 +1,5 @@
 // ==========================================
-// GUIDED DEMO TOUR SYSTEM (COMPLETED USER BY USER)
+// GUIDED DEMO TOUR SYSTEM (WITH NEXT, PREVIOUS, PAUSE/RESUME & AUTO PLAY)
 // ==========================================
 const demoSteps = [
     // USER 1: MANAGING DIRECTOR (MD)
@@ -65,40 +65,185 @@ const demoSteps = [
     ["D_GRADE_MO", "dashboard", ".content", "User 15/15 (D-Grade MO): Basic marketing dashboard with restricted package controls."],
     ["D_GRADE_MO", "packages", ".content", "User 15/15 (D-Grade MO): Restricted package sections locked with 🔒 tooltip."]
 ];
+
 let demoIndex = 0;
 let demoActive = false;
+let demoPaused = false;
+let autoPlayEnabled = true;
+let stepDuration = 5; // 5 seconds per step
+let countdownTimer = null;
+let currentCountdown = stepDuration;
 
 function startRoleDemo() {
     demoActive = true;
     demoIndex = 0;
+    demoPaused = false;
     runDemoStep();
 }
 
 function runDemoStep() {
+    clearAutoPlayTimer();
     const s = demoSteps[demoIndex];
     switchRole(s[0]);
     show(s[1]);
-    setTimeout(() => spotlight(s), 300);
+    setTimeout(() => {
+        spotlight(s);
+        startAutoPlayTimer();
+    }, 300);
+}
+
+function startAutoPlayTimer() {
+    clearAutoPlayTimer();
+    if (!autoPlayEnabled || demoPaused) return;
+
+    currentCountdown = stepDuration;
+    updateCountdownUI();
+
+    countdownTimer = setInterval(() => {
+        if (!autoPlayEnabled || demoPaused) {
+            clearAutoPlayTimer();
+            return;
+        }
+        currentCountdown--;
+        updateCountdownUI();
+
+        if (currentCountdown <= 0) {
+            clearAutoPlayTimer();
+            nextDemoStep();
+        }
+    }, 1000);
+}
+
+function clearAutoPlayTimer() {
+    if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+    }
+}
+
+function toggleDemoPause() {
+    demoPaused = !demoPaused;
+    if (demoPaused) {
+        clearAutoPlayTimer();
+        toast("Demo Tour Paused ⏸", "pause");
+    } else {
+        toast("Demo Tour Resumed ▶", "play");
+        startAutoPlayTimer();
+    }
+    refreshControlUI();
+}
+
+function toggleAutoPlay() {
+    autoPlayEnabled = !autoPlayEnabled;
+    if (!autoPlayEnabled) {
+        clearAutoPlayTimer();
+        demoPaused = false;
+        toast("Auto Play Disabled — Manual Mode", "hand");
+    } else {
+        demoPaused = false;
+        toast("Auto Play Enabled (5s per step)", "sparkles");
+        startAutoPlayTimer();
+    }
+    refreshControlUI();
+}
+
+function updateCountdownUI() {
+    const badge = $("#demoTimerBadge");
+    const bar = $("#demoCountdownBar");
+    if (badge) {
+        if (autoPlayEnabled && !demoPaused) {
+            badge.textContent = `Auto-Next in ${currentCountdown}s`;
+            badge.classList.remove("hidden");
+        } else if (demoPaused) {
+            badge.textContent = "Paused ⏸";
+            badge.classList.remove("hidden");
+        } else {
+            badge.classList.add("hidden");
+        }
+    }
+    if (bar) {
+        const pct = autoPlayEnabled && !demoPaused ? (currentCountdown / stepDuration) * 100 : 0;
+        bar.style.width = pct + "%";
+    }
+}
+
+function refreshControlUI() {
+    const pauseBtn = $("#demoPauseBtn");
+    const autoPlayBtn = $("#demoAutoPlayBtn");
+    
+    if (pauseBtn) {
+        pauseBtn.innerHTML = demoPaused 
+            ? `<i data-lucide="play" class="w-3.5 h-3.5"></i> Resume ▶` 
+            : `<i data-lucide="pause" class="w-3.5 h-3.5"></i> Pause ⏸`;
+    }
+    if (autoPlayBtn) {
+        autoPlayBtn.className = autoPlayEnabled 
+            ? "btn py-1 px-2 text-[11px] bg-emerald-700 text-white" 
+            : "btn py-1 px-2 text-[11px] bg-slate-700 text-slate-300";
+        autoPlayBtn.textContent = autoPlayEnabled ? "Auto Play: ON" : "Auto Play: OFF";
+    }
+    updateCountdownUI();
+    icons();
 }
 
 function spotlight(s) {
     const target = document.querySelector(s[2]) || content;
+    const isFirstStep = demoIndex === 0;
+    const isLastStep = demoIndex === demoSteps.length - 1;
+
     $("#overlayRoot").innerHTML = `
         <div class="demo-dim"></div>
         <div id="demoRing" class="demo-ring"></div>
-        <aside id="demoTooltip" class="demo-tooltip">
-            <p class="text-[10px] font-bold tracking-widest text-blue-600 uppercase">User-Based Demo Tour · Step ${demoIndex + 1} of ${demoSteps.length}</p>
-            <h3 class="font-bold text-slate-900 text-lg mt-1">${ROLE_CONFIG[s[0]].label}</h3>
-            <p class="text-xs text-slate-600 mt-2 leading-relaxed">${s[3]}</p>
-            <button class="btn btn-primary w-full mt-4 text-xs" onclick="nextDemoStep()">Continue Tour <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+        <aside id="demoTooltip" class="demo-tooltip shadow-2xl border border-slate-200">
+            <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                <span class="text-[10px] font-bold tracking-widest text-blue-600 uppercase">Step ${demoIndex + 1} of ${demoSteps.length}</span>
+                <span id="demoTimerBadge" class="tag bg-amber-100 text-amber-900 text-[10px] font-bold"></span>
+            </div>
+            
+            <h3 class="font-bold text-slate-900 text-base mt-2">${ROLE_CONFIG[s[0]].label}</h3>
+            <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">${s[3]}</p>
+            
+            <!-- STEP NAVIGATION CONTROLS -->
+            <div class="mt-4 pt-3 border-t flex items-center justify-between gap-1.5">
+                <button class="btn btn-outline text-xs py-1.5 px-2.5" onclick="prevDemoStep()" ${isFirstStep ? "disabled" : ""}>
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i> Prev
+                </button>
+                
+                <button id="demoPauseBtn" class="btn btn-secondary text-xs py-1.5 px-3" onclick="toggleDemoPause()">
+                    <i data-lucide="${demoPaused ? "play" : "pause"}" class="w-3.5 h-3.5"></i> ${demoPaused ? "Resume ▶" : "Pause ⏸"}
+                </button>
+                
+                <button class="btn btn-primary text-xs py-1.5 px-3" onclick="nextDemoStep()">
+                    ${isLastStep ? "Finish ✓" : "Next ▶"}
+                </button>
+            </div>
         </aside>
-        <section class="demo-bar flex justify-between items-center text-xs">
-            <span><b>USER DEMO TOUR:</b> ${ROLE_CONFIG[s[0]].label} (Step ${demoIndex + 1} / ${demoSteps.length})</span>
-            <button class="text-blue-300 font-semibold" onclick="exitDemo()">Exit Tour</button>
+
+        <!-- BOTTOM CONTROL & PROGRESS BAR -->
+        <section class="demo-bar flex flex-col gap-2">
+            <div class="flex justify-between items-center text-xs">
+                <div class="flex items-center gap-3">
+                    <span><b>USER DEMO TOUR:</b> ${ROLE_CONFIG[s[0]].label} (${demoIndex + 1}/${demoSteps.length})</span>
+                    <button id="demoAutoPlayBtn" onclick="toggleAutoPlay()" class="btn py-1 px-2 text-[11px] ${autoPlayEnabled ? "bg-emerald-700 text-white" : "bg-slate-700 text-slate-300"}">
+                        ${autoPlayEnabled ? "Auto Play: ON" : "Auto Play: OFF"}
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="text-slate-300 hover:text-white px-2 py-0.5 rounded bg-white/10 text-[11px]" onclick="prevDemoStep()" ${isFirstStep ? "disabled" : ""}>◄ Prev</button>
+                    <button class="text-slate-300 hover:text-white px-2 py-0.5 rounded bg-white/10 text-[11px]" onclick="nextDemoStep()">Next ►</button>
+                    <button class="text-blue-300 hover:text-white font-semibold ml-2 text-xs" onclick="exitDemo()">Exit Tour</button>
+                </div>
+            </div>
+            <!-- ANIMATED COUNTDOWN PROGRESS BAR -->
+            <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden flex">
+                <div id="demoCountdownBar" class="bg-amber-400 h-full transition-all duration-1000 ease-linear" style="width:100%"></div>
+            </div>
         </section>
     `;
+    
     icons();
     target.classList.add("demo-focus");
+    refreshControlUI();
 
     const ring = $("#demoRing");
     const tip = $("#demoTooltip");
@@ -111,11 +256,21 @@ function spotlight(s) {
 
     if (innerWidth > 900) {
         tip.style.left = Math.min(innerWidth - 400, Math.max(16, r.right + 20)) + "px";
-        tip.style.top = Math.max(20, Math.min(innerHeight - 240, r.top)) + "px";
+        tip.style.top = Math.max(20, Math.min(innerHeight - 260, r.top)) + "px";
+    }
+}
+
+function prevDemoStep() {
+    clearAutoPlayTimer();
+    document.querySelectorAll(".demo-focus").forEach(x => x.classList.remove("demo-focus"));
+    if (demoIndex > 0) {
+        demoIndex--;
+        runDemoStep();
     }
 }
 
 function nextDemoStep() {
+    clearAutoPlayTimer();
     document.querySelectorAll(".demo-focus").forEach(x => x.classList.remove("demo-focus"));
     if (demoIndex >= demoSteps.length - 1) {
         demoActive = false;
@@ -136,8 +291,19 @@ function nextDemoStep() {
 }
 
 function exitDemo() {
+    clearAutoPlayTimer();
     demoActive = false;
+    demoPaused = false;
     document.querySelectorAll(".demo-focus").forEach(x => x.classList.remove("demo-focus"));
     closeOverlay();
     show("dashboard");
 }
+
+// Global Keyboard Navigation Listener for Tour Controls
+document.addEventListener("keydown", e => {
+    if (!demoActive) return;
+    if (e.key === "ArrowRight") { e.preventDefault(); nextDemoStep(); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); prevDemoStep(); }
+    if (e.key === " ") { e.preventDefault(); toggleDemoPause(); }
+    if (e.key === "Escape") { e.preventDefault(); exitDemo(); }
+});

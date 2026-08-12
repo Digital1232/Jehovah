@@ -214,11 +214,6 @@ $("#notificationBtn").onclick = () => show("notifications");
 $("#demoBtn").onclick = () => startRoleDemo();
 $("#menuBtn").onclick = () => $("#sidebar").classList.toggle("open");
 
-document.addEventListener("keydown", e => {
-    if (demoActive && e.key === "Escape") exitDemo();
-    if (demoActive && e.key === "ArrowRight") nextDemoStep();
-});
-
 // Initialize Application
 renderControls();
 renderNav();
