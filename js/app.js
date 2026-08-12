@@ -37,6 +37,7 @@ const pages = {
     meetings: meetingsView,
     followups: followupsView,
     pipeline: pipelineView,
+    whatsapp: whatsappHubView,
     quotations: quotationsView,
     packages: packagesView,
     jobcards: jobcardsView,

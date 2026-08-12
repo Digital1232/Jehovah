@@ -178,6 +178,7 @@ const NAVIGATION = [
     { id: "meetings", label: "Meetings", icon: "users-round", group: "WORKSPACE", roles: ["MD", "HEAD_OFFICE_ADMIN", "MAIN_ADMIN", "SECOND_ADMIN", "TL", "ASM", "BM", "MO", "REAL_ESTATE", "INTERIOR"] },
     { id: "followups", label: "Follow-ups", icon: "calendar-check-2", group: "WORKSPACE", roles: ["MD", "HEAD_OFFICE_ADMIN", "MAIN_ADMIN", "SECOND_ADMIN", "TL", "ASM", "BM", "REAL_ESTATE", "INTERIOR"] },
     { id: "pipeline", label: "Sales Pipeline", icon: "columns-3", group: "WORKSPACE", roles: ["MD", "HEAD_OFFICE_ADMIN", "MAIN_ADMIN", "SECOND_ADMIN", "ASM", "BM", "REAL_ESTATE", "INTERIOR"] },
+    { id: "whatsapp", label: "WhatsApp Hub 💬", icon: "message-square", group: "COMMERCIAL", roles: ["MD", "HEAD_OFFICE_ADMIN", "MAIN_ADMIN", "SECOND_ADMIN", "ENQUIRY", "TL", "ASM", "BM", "ACCOUNTS", "REAL_ESTATE", "INTERIOR", "A_GRADE_MO", "D_GRADE_MO"] },
     { id: "quotations", label: "Quotations", icon: "file-text", group: "COMMERCIAL", roles: ["MD", "HEAD_OFFICE_ADMIN", "MAIN_ADMIN", "SECOND_ADMIN", "TL", "ASM", "BM", "A_GRADE_MO", "D_GRADE_MO"] },
     { id: "packages", label: "Package Config", icon: "box", group: "COMMERCIAL", roles: ["MD", "HEAD_OFFICE_ADMIN", "MAIN_ADMIN", "A_GRADE_MO", "D_GRADE_MO"] },
     { id: "jobcards", label: "Job Cards", icon: "clipboard-list", group: "OPERATIONS", roles: ["MD", "HEAD_OFFICE_ADMIN", "MAIN_ADMIN", "SECOND_ADMIN", "BM", "ACCOUNTS", "PROJECT"] },
