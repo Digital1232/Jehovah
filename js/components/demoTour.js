@@ -70,7 +70,7 @@ let demoIndex = 0;
 let demoActive = false;
 let demoPaused = false;
 let autoPlayEnabled = true;
-let stepDuration = 5; // 5 seconds per step
+let stepDuration = 60; // 1 minute (60 seconds) per step
 let countdownTimer = null;
 let currentCountdown = stepDuration;
 
@@ -141,7 +141,7 @@ function toggleAutoPlay() {
         toast("Auto Play Disabled — Manual Mode", "hand");
     } else {
         demoPaused = false;
-        toast("Auto Play Enabled (5s per step)", "sparkles");
+        toast("Auto Play Enabled (1 min per step)", "sparkles");
         startAutoPlayTimer();
     }
     refreshControlUI();
@@ -180,7 +180,7 @@ function refreshControlUI() {
         autoPlayBtn.className = autoPlayEnabled 
             ? "btn py-1 px-2 text-[11px] bg-emerald-700 text-white" 
             : "btn py-1 px-2 text-[11px] bg-slate-700 text-slate-300";
-        autoPlayBtn.textContent = autoPlayEnabled ? "Auto Play: ON" : "Auto Play: OFF";
+        autoPlayBtn.textContent = autoPlayEnabled ? "Auto Play: ON (1 min)" : "Auto Play: OFF";
     }
     updateCountdownUI();
     icons();
@@ -225,7 +225,7 @@ function spotlight(s) {
                 <div class="flex items-center gap-3">
                     <span><b>USER DEMO TOUR:</b> ${ROLE_CONFIG[s[0]].label} (${demoIndex + 1}/${demoSteps.length})</span>
                     <button id="demoAutoPlayBtn" onclick="toggleAutoPlay()" class="btn py-1 px-2 text-[11px] ${autoPlayEnabled ? "bg-emerald-700 text-white" : "bg-slate-700 text-slate-300"}">
-                        ${autoPlayEnabled ? "Auto Play: ON" : "Auto Play: OFF"}
+                        ${autoPlayEnabled ? "Auto Play: ON (1 min)" : "Auto Play: OFF"}
                     </button>
                 </div>
                 <div class="flex items-center gap-2">
