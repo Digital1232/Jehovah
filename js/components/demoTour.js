@@ -46,6 +46,31 @@ let stepDuration = 60; // 1 minute (60 seconds) per step
 let countdownTimer = null;
 let currentCountdown = stepDuration;
 
+let activeTargetEl = null;
+
+function updateRingPosition() {
+    const ring = $("#demoRing");
+    if (!ring || !demoActive) return;
+
+    const target = activeTargetEl || document.querySelector(".page") || document.querySelector(".content");
+    if (!target) return;
+
+    const r = target.getBoundingClientRect();
+
+    const left = Math.max(8, r.left - 6);
+    const top = Math.max(8, r.top - 6);
+    const width = Math.min(window.innerWidth - left - 12, r.width + 12);
+    const height = Math.min(window.innerHeight - top - 12, r.height + 12);
+
+    ring.style.left = left + "px";
+    ring.style.top = top + "px";
+    ring.style.width = width + "px";
+    ring.style.height = height + "px";
+}
+
+window.addEventListener("scroll", updateRingPosition, true);
+window.addEventListener("resize", updateRingPosition);
+
 function startRoleDemo() {
     demoSteps = buildDemoStepsForRoles();
     demoActive = true;
@@ -61,6 +86,11 @@ function runDemoStep() {
     }
     const s = demoSteps[demoIndex];
     if (!s) return;
+
+    // Reset scroll positions so ring doesn't jump offscreen
+    window.scrollTo(0, 0);
+    const ws = document.querySelector(".workspace");
+    if (ws) ws.scrollTop = 0;
 
     // Switch Role and Navigate to Menu
     switchRole(s[0]);
@@ -167,7 +197,8 @@ function refreshControlUI() {
 }
 
 function spotlight(s) {
-    const target = document.querySelector(s[2]) || content;
+    const target = document.querySelector(".page") || document.querySelector(s[2]) || content;
+    activeTargetEl = target;
     const isFirstStep = demoIndex === 0;
     const isLastStep = demoIndex === demoSteps.length - 1;
 
@@ -207,14 +238,7 @@ function spotlight(s) {
     icons();
     target.classList.add("demo-focus");
     refreshControlUI();
-
-    const ring = $("#demoRing");
-    const r = target.getBoundingClientRect();
-
-    ring.style.left = Math.max(6, r.left - 6) + "px";
-    ring.style.top = Math.max(6, r.top - 6) + "px";
-    ring.style.width = Math.min(innerWidth - 12, r.width + 12) + "px";
-    ring.style.height = Math.min(innerHeight - 12, r.height + 12) + "px";
+    updateRingPosition();
 }
 
 function prevDemoStep() {
